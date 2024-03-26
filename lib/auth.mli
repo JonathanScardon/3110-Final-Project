@@ -1,10 +1,7 @@
 (* auth.mli *)
 
-open Cryptokit
-(** Cryptokit module used for password hashing. *)
-
-val credentials_path : string
-(** The path to the CSV file storing user credentials. *)
+val credentials_path : unit -> string
+(** Returns the path to the CSV file storing user credentials. *)
 
 val username_exists : string -> bool
 (** [username_exists username] checks if the given [username] exists in the 

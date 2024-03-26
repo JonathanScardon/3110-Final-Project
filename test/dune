@@ -1,2 +1,5 @@
 (test
- (name test_final_project))
+ (name test_auth)
+ (preprocess
+  (pps bisect_ppx))
+ (libraries ounit2 final_project bisect_ppx.runtime))
