@@ -26,7 +26,10 @@ and invalid_option () =
 
 and login () =
   let username, password = request_credentials "Login" in
-  if authenticate username password then login_success () else login_failure ()
+  if Final_project.Auth.username_exists username = false then
+    username_doesnt_exist ()
+  else if authenticate username password then login_success username
+  else login_failure ()
 
 and register () =
   let username, password = request_credentials "Register" in
@@ -36,15 +39,15 @@ and register () =
 
 and request_credentials prompt =
   print_endline prompt;
-  print_string "Choose a username: ";
+  print_string "Enter a username: ";
   let username = read_line () in
-  print_string "Choose a password: ";
+  print_string "Enter a password: ";
   let password = read_line () in
   (username, password)
 
-and login_success () =
+and login_success user =
   print_endline "Login successful!";
-  (* Placeholder for redirecting to the dashboard *) main_menu ()
+  Final_project.Overview.dashboard_login user
 
 and login_failure () =
   print_endline "Invalid username or password.";
@@ -57,6 +60,10 @@ and registration_success () =
 and username_exists () =
   print_endline "Username already exists.";
   main_menu ()
+
+and username_doesnt_exist () =
+  print_endline "This user does not exist. Please try again.";
+  login ()
 
 and main_menu () =
   print_menu ();
