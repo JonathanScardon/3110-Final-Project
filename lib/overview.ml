@@ -3,6 +3,7 @@ let rec process_choice user =
   match choice with
   | "1" -> ()
   | "2" -> ()
+  | "3" -> ()
   | "4" ->
       print_endline "Exiting...";
       exit 0
