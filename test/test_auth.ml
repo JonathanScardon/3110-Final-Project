@@ -2,6 +2,7 @@ open OUnit2
 open Final_project.Auth
 
 (* Helper function to clear the test CSV file before each test *)
+(* Cite ChatGPT for assistance in file clearing with Unix *)
 let clear_test_csv () =
   let test_dir = "test" in
   if not (Sys.file_exists test_dir) then Unix.mkdir test_dir 0o755;
