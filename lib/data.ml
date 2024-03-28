@@ -1,16 +1,12 @@
 let add_data data path =
   try
     let sheet = Csv.load path in
-    Csv.save path (data :: sheet);
-    true
+    Csv.save path (data :: sheet)
   with
-  | Sys_error msg ->
-      Printf.eprintf "File system error: %s\n" msg;
-      false
+  | Sys_error msg -> Printf.eprintf "File system error: %s\n" msg
   | e ->
       Printf.eprintf "CSV operation failed or unexpected exception: %s\n"
-        (Printexc.to_string e);
-      false
+        (Printexc.to_string e)
 
 let rec data_aux_limit lst acc limit =
   if limit = 0 then acc
@@ -38,7 +34,7 @@ let get_data path limit =
               sheet ""
           ^ "\n")
 
-(* remove, modify, data analysis, search *)
+(* modify, data analysis, erase all data *)
 
 let rec contains lst elm =
   match lst with
@@ -52,3 +48,7 @@ let rec remove_data_list path data =
   | h :: t -> if contains h data then t else h :: remove_data_list path data
 
 let remove_data path data = Csv.save path (remove_data_list path data)
+
+let search id path =
+  let sheet = Csv.load path in
+  List.exists (fun row -> List.nth row 0 = id) sheet

@@ -1,7 +1,9 @@
+open Mood
+
 let rec process_choice user =
   let choice = read_line () in
   match choice with
-  | "1" -> ()
+  | "1" -> mood_interface user
   | "2" -> ()
   | "3" -> ()
   | "4" ->
