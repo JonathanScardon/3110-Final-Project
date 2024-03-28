@@ -23,3 +23,24 @@ let see_history user =
     let limit = int_of_string (read_line ()) in
     print_endline (header ^ get_data ("data/" ^ user ^ "_mood.csv") (Some limit))
   else print_endline (header ^ get_data ("data/" ^ user ^ "_mood.csv") None)
+
+let rec search_entry user =
+  print_string "Enter a date in the format day-month-year (ex. 2-3-2024) ";
+  let date = read_line () in
+  let header = "\nDate | Happiness | Mood" in
+  let path = "data/" ^ user ^ "_mood.csv" in
+  try print_endline (header ^ find_entry date path)
+  with Not_found ->
+    print_endline "Sorry, this entry does not exist!";
+    search_entry user
+
+let rec remove_entry user =
+  print_string "Enter a date in the format day-month-year (ex. 2-3-2024) ";
+  let date = read_line () in
+  let path = "data/" ^ user ^ "_mood.csv" in
+  try
+    remove_data path date;
+    print_endline "Removed entry successfully."
+  with Not_found ->
+    print_endline "Sorry, this entry does not exist!";
+    remove_entry user

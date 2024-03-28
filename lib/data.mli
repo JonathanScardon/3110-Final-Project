@@ -6,8 +6,13 @@ val get_data : string -> int option -> string
     If [limit] is None, all of the data is displayed. *)
 
 val remove_data : string -> string -> unit
-(** [remove_data path data] removes the row containing [data] from the CSV at the given [path] *)
+(** [remove_data path data] removes the row containing [data] from the CSV at the given [path]. 
+    Raises [Not_found] if there is no such entry. *)
 
 val search : string -> string -> bool
 (** [search id path] returns if the row with [id] as a first element is 
+    contained within the CSV [path]. *)
+
+val find_entry : string -> string -> string
+(** [find_entry id path] returns the first entry with [id] as a first element, 
     contained within the CSV [path]. *)

@@ -41,14 +41,21 @@ let rec contains lst elm =
   | [] -> false
   | h :: t -> if h = elm then true else contains t elm
 
-let rec remove_data_list path data =
-  let lst = Csv.load path in
+let rec remove_data_list lst data =
   match lst with
-  | [] -> []
-  | h :: t -> if contains h data then t else h :: remove_data_list path data
+  | [] -> raise Not_found
+  | h :: t -> if contains h data then t else h :: remove_data_list t data
 
-let remove_data path data = Csv.save path (remove_data_list path data)
+let remove_data path data =
+  let lst = Csv.load path in
+  Csv.save path (remove_data_list lst data)
 
 let search id path =
   let sheet = Csv.load path in
   List.exists (fun row -> List.nth row 0 = id) sheet
+
+let find_entry id path =
+  let sheet = Csv.load path in
+  "\n"
+  ^ String.concat " " (List.find (fun row -> List.nth row 0 = id) sheet)
+  ^ "\n"
