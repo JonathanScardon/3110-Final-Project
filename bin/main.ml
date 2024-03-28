@@ -2,7 +2,7 @@
 open Final_project.Auth
 
 let print_menu () =
-  print_endline "Welcome to the Daily Life Planner (DLP)";
+  print_endline "\nWelcome to the Daily Life Planner (DLP)";
   print_endline "1. Login";
   print_endline "2. Register";
   print_endline "3. Exit";
