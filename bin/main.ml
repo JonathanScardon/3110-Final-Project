@@ -48,6 +48,8 @@ and delete () =
     if read_line () = "y" then (
       try
         Final_project.Data.remove_data "data/user_credentials.csv" username;
+        Sys.remove ("data/" ^ username ^ "_mood.csv");
+        Sys.remove ("data/" ^ username ^ "_quotes.csv");
         print_endline "Account removed successfully.";
         print_menu ();
         process_choice ()
