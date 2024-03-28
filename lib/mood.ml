@@ -46,6 +46,20 @@ let rec remove_entry user =
     print_endline "Sorry, this entry does not exist!";
     remove_entry user
 
+let add_quote user =
+  print_string "Enter a message: ";
+  let message = read_line () in
+  let path = "data/" ^ user ^ "_quotes.csv" in
+  add_data [ message ] path;
+  print_endline "Message saved successfully."
+
 let get_random_quote user =
   let quotes = Csv.load ("data/" ^ user ^ "_quotes.csv") in
-  List.nth (List.nth quotes (Random.int (List.length quotes))) 0
+  try List.nth (List.nth quotes (Random.int (List.length quotes))) 0
+  with Invalid_argument _ -> ""
+
+let remove_curr_quote user curr_quote =
+  try
+    remove_data ("data/" ^ user ^ "_quotes.csv") curr_quote;
+    print_endline "Removed quote successfully."
+  with Not_found -> print_endline "Something went wrong."

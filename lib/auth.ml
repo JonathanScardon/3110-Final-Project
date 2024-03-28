@@ -11,7 +11,7 @@ let credentials_path () =
         | Some "test" -> "test/test_auth.csv"
         | _ -> "data/user_credentials.csv")
   in
-  print_endline ("Using credentials path: " ^ path);
+  (* print_endline ("Using credentials path: " ^ path); *)
   (* Debug print *)
   path
 
@@ -31,20 +31,7 @@ let add_user username hashed_password =
       Csv.save ("data/" ^ username ^ "_mood.csv") [ [] ];
       Csv.save
         ("data/" ^ username ^ "_quotes.csv")
-        [
-          [
-            "The mystery of life isn't a problem to solve, but a reality to \
-             experience.";
-          ];
-          [
-            "Without change something sleeps inside us, and seldom awakens. \
-             The sleeper must awaken.";
-          ];
-          [
-            "A process cannot be understood by stopping it. Understanding must \
-             move with the flow of the process, must join it and flow with it.";
-          ];
-        ];
+        (Csv.load "data/quotesdata.csv");
       true
   with
   | Sys_error msg ->
