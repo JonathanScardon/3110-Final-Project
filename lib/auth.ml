@@ -28,6 +28,7 @@ let add_user username hashed_password =
       let credentials = Csv.load (credentials_path ()) in
       Csv.save (credentials_path ())
         (credentials @ [ [ username; hashed_password ] ]);
+      Csv.save ("data/" ^ username ^ "_mood.csv") [ [] ];
       true
   with
   | Sys_error msg ->

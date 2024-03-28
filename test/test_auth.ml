@@ -10,6 +10,8 @@ let clear_test_csv () =
   output_string oc "";
   close_out oc
 
+(* let () = print_endline (Final_project.Data.get_data "data/test.csv" (Some 3)) *)
+
 let test_add_user _ =
   clear_test_csv ();
   assert_bool "add_user should return true for a new username"
