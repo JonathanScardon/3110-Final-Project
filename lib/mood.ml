@@ -13,6 +13,7 @@ let rec happiness_log () =
   else happiness_log ()
 
 let see_history user =
+  let header = "\nDate | Happiness | Mood" in
   print_string "Would you like to limit the history you see? (y/n) ";
   if read_line () = "y" then
     let () =
@@ -20,5 +21,5 @@ let see_history user =
         "How many recent entries would you like to see? (enter a number) "
     in
     let limit = int_of_string (read_line ()) in
-    print_endline (get_data ("data/" ^ user ^ "_mood.csv") (Some limit))
-  else print_endline (get_data ("data/" ^ user ^ "_mood.csv") None)
+    print_endline (header ^ get_data ("data/" ^ user ^ "_mood.csv") (Some limit))
+  else print_endline (header ^ get_data ("data/" ^ user ^ "_mood.csv") None)

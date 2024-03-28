@@ -2,7 +2,7 @@ open Data
 
 let rec mood_interface user =
   let path = "data/" ^ user ^ "_mood.csv" in
-  print_endline ("\nWelcome to your mood tracker, " ^ user ^ "!");
+  print_endline "\nMood Tracker";
   if search Mood.curr_date path then (
     print_endline "Would you like to:";
     print_endline "1. Add a small message for your future self?";
@@ -47,7 +47,7 @@ and process_choice user =
       dashboard_login user
 
 and dashboard_login user =
-  print_endline ("\nWelcome to your dashboard, " ^ user ^ "!");
+  print_endline ("\nHello, " ^ user);
   print_endline "1. Mood Tracker";
   print_endline "2. Diet Tracker";
   print_endline "3. Finances Tracker";
