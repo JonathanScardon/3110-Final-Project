@@ -63,12 +63,16 @@ and delete () =
   else login_failure ()
 
 and request_credentials prompt =
-  print_endline prompt;
+  print_endline (prompt ^ " (or enter 'back' to return to the main menu)");
   print_string "Enter a username: ";
   let username = read_line () in
-  print_string "Enter a password: ";
-  let password = read_line () in
-  (username, password)
+  if username = "back" then (
+    main_menu ();
+    raise Exit)
+  else (
+    print_string "Enter a password: ";
+    let password = read_line () in
+    (username, password))
 
 and login_success user =
   print_endline "Login successful!";
@@ -76,7 +80,7 @@ and login_success user =
 
 and login_failure () =
   print_endline "Invalid username or password.";
-  main_menu ()
+  login ()
 
 and registration_success () =
   print_endline "Registration successful!";
