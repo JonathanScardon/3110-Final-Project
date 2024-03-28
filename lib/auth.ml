@@ -35,8 +35,12 @@ let add_user username hashed_password =
           [
             "The mystery of life isn't a problem to solve, but a reality to \
              experience.";
+          ];
+          [
             "Without change something sleeps inside us, and seldom awakens. \
              The sleeper must awaken.";
+          ];
+          [
             "A process cannot be understood by stopping it. Understanding must \
              move with the flow of the process, must join it and flow with it.";
           ];

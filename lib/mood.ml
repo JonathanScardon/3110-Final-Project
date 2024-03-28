@@ -1,5 +1,6 @@
 open Data
 
+let () = Random.self_init ()
 let day = string_of_int (Unix.localtime (Unix.time ())).tm_mday
 let month = string_of_int ((Unix.localtime (Unix.time ())).tm_mon + 1)
 let year = string_of_int ((Unix.localtime (Unix.time ())).tm_year + 1900)
@@ -44,3 +45,7 @@ let rec remove_entry user =
   with Not_found ->
     print_endline "Sorry, this entry does not exist!";
     remove_entry user
+
+let get_random_quote user =
+  let quotes = Csv.load ("data/" ^ user ^ "_quotes.csv") in
+  List.nth (List.nth quotes (Random.int (List.length quotes))) 0

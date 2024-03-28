@@ -3,6 +3,7 @@ open Data
 let rec mood_interface user =
   let path = "data/" ^ user ^ "_mood.csv" in
   print_endline "\nMood Tracker";
+  print_endline (Mood.get_random_quote user);
   if search Mood.curr_date path then (
     print_endline "Would you like to:";
     print_endline "1. Add a small message for your future self?";
@@ -13,7 +14,6 @@ let rec mood_interface user =
     print_string "Please choose an option: ";
     after_mood_input user)
   else (
-    print_endline "Inspirational Quote";
     print_string "How are you feeling today? ";
     process_mood user)
 
