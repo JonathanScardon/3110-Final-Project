@@ -5,7 +5,8 @@ let print_menu () =
   print_endline "\nWelcome to the Daily Life Planner (DLP)";
   print_endline "1. Login";
   print_endline "2. Register";
-  print_endline "3. Exit";
+  print_endline "3. Delete Account";
+  print_endline "4. Exit";
   print_string "Please choose an option: "
 
 let rec process_choice () =
@@ -13,7 +14,8 @@ let rec process_choice () =
   match choice with
   | "1" -> login ()
   | "2" -> register ()
-  | "3" -> exit_program ()
+  | "3" -> delete ()
+  | "4" -> exit_program ()
   | _ -> invalid_option ()
 
 and exit_program () =
@@ -36,6 +38,27 @@ and register () =
   let hashed_password = hash_password password in
   if add_user username hashed_password then registration_success ()
   else username_exists ()
+
+and delete () =
+  let username, password = request_credentials "Login" in
+  if Final_project.Auth.username_exists username = false then
+    username_doesnt_exist ()
+  else if authenticate username password then (
+    print_string "Are you sure you want to delete your account? (y/n) ";
+    if read_line () = "y" then (
+      try
+        Final_project.Data.remove_data "data/user_credentials.csv" username;
+        print_endline "Account removed successfully.";
+        print_menu ();
+        process_choice ()
+      with Not_found ->
+        print_endline "Sorry, this account does not exist!";
+        print_menu ();
+        process_choice ())
+    else (
+      print_menu ();
+      process_choice ()))
+  else login_failure ()
 
 and request_credentials prompt =
   print_endline prompt;
