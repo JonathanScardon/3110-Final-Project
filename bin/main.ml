@@ -1,29 +1,36 @@
 (* main.ml *)
 open Final_project.Auth
+open ANSITerminal
 
 let print_menu () =
-  print_endline "\nWelcome to the Daily Life Planner (DLP)";
-  print_endline "1. Login";
-  print_endline "2. Register";
-  print_endline "3. Delete Account";
-  print_endline "4. Exit";
-  print_string "Please choose an option: "
+  print_string [ Reset ] "\n";
+
+  print_string [ Bold ] "\nWelcome to the Daily Life Planner (DLP)\n";
+  print_string [ Reset ] "1. Login\n";
+  print_string [ Reset ] "2. Register\n";
+  print_string [ Reset ] "3. Delete Account\n";
+  print_string [ Reset ] "4. Exit\n";
+  print_string [ Bold ] "Please choose an option: "
 
 let rec process_choice () =
-  let choice = read_line () in
-  match choice with
-  | "1" -> login ()
-  | "2" -> register ()
-  | "3" -> delete ()
-  | "4" -> exit_program ()
-  | _ -> invalid_option ()
+  try
+    let choice = read_line () in
+    match choice with
+    | "1" -> login ()
+    | "2" -> register ()
+    | "3" -> delete ()
+    | "4" -> exit_program ()
+    | _ -> invalid_option ()
+  with Exit -> main_menu ()
 
 and exit_program () =
-  print_endline "Exiting...";
+  print_string [ Reset ] "\n";
+  print_string [ Foreground Green ] "Exiting... Thank you for using OcamLife!\n";
   exit 0
 
 and invalid_option () =
-  print_endline "Invalid option. Please try again.";
+  print_string [ Reset ] "\n";
+  print_string [ Foreground Red ] "Invalid option. Please try again.\n";
   main_menu ()
 
 and login () =
@@ -44,7 +51,8 @@ and delete () =
   if Final_project.Auth.username_exists username = false then
     username_doesnt_exist ()
   else if authenticate username password then (
-    print_string "Are you sure you want to delete your account? (y/n) ";
+    print_string [ Reset ]
+      "Are you sure you want to delete your account? (y/n) ";
     if read_line () = "y" then (
       try
         Final_project.Data.remove_data "data/user_credentials.csv" username;
@@ -63,35 +71,53 @@ and delete () =
   else login_failure ()
 
 and request_credentials prompt =
-  print_endline (prompt ^ " (or enter 'back' to return to the main menu)");
-  print_string "Enter a username: ";
+  print_string [ Reset ] "\n";
+  let action_color =
+    match prompt with
+    | "Login" -> [ Foreground Green ]
+    | "Register" -> [ Foreground Blue ]
+    | _ -> [ Reset ]
+  in
+  print_string action_color
+    (prompt ^ " (or enter 'back' to return to the main menu)\n");
+  print_string [ Reset ] "Enter a username: ";
   let username = read_line () in
   if username = "back" then (
     main_menu ();
     raise Exit)
   else (
-    print_string "Enter a password: ";
+    print_string [ Reset ] "Enter a password: ";
     let password = read_line () in
     (username, password))
 
 and login_success user =
-  print_endline "Login successful!";
+  print_string [ Foreground Green ] "Login successful!\n";
   Final_project.Overview.dashboard_login user
 
 and login_failure () =
-  print_endline "Invalid username or password.";
+  print_string [ Foreground Red ]
+    "Invalid username or password. Please press enter to try again.\n";
+  ignore (read_line ());
   login ()
 
 and registration_success () =
-  print_endline "Registration successful!";
+  print_string [ Foreground Green ] "Registration successful!";
+  prompt_for_acknowledgment "Redirecting to login";
   login ()
 
+and prompt_for_acknowledgment message =
+  print_string [ Reset ] (message ^ " Press enter to continue.\n");
+  ignore (read_line ())
+
 and username_exists () =
-  print_endline "Username already exists.";
-  main_menu ()
+  print_string [ Foreground Red ]
+    "Username already exists. Please press enter to try a different one.\n";
+  ignore (read_line ());
+  register ()
 
 and username_doesnt_exist () =
-  print_endline "This user does not exist. Please try again.";
+  print_string [ Foreground Red ]
+    "This user does not exist. Please try again.\n";
   login ()
 
 and main_menu () =

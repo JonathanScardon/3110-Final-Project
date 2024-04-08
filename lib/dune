@@ -1,5 +1,5 @@
 (library
  (name final_project)
- (libraries csv cryptokit unix)
+ (libraries csv cryptokit unix ANSITerminal)
  (preprocess
   (pps bisect_ppx)))

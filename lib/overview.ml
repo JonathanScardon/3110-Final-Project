@@ -1,23 +1,30 @@
 open Data
+open ANSITerminal
 
 let rec mood_interface user =
   let path = "data/" ^ user ^ "_mood.csv" in
-  print_endline "\nMood Tracker";
+  print_string [ Bold; Foreground Yellow ] "\nMood Tracker\n";
   let rand_quote = Mood.get_random_quote user in
-  print_endline rand_quote;
+  print_string [ Reset; Foreground Cyan ] (rand_quote ^ "\n");
   if search Mood.curr_date path then (
-    print_endline "Would you like to:";
-    print_endline "1. Add a small message for your future self?";
-    print_endline "2. See your journal history?";
-    print_endline "3. Search for a particular day?";
-    print_endline "4. Remove a journal entry?";
-    print_endline "5. Remove currently displayed quote?";
-    print_endline "6. Exit";
-    print_string "Please choose an option: ";
+    print_strings [ Reset ]
+      [
+        "Would you like to:\n";
+        "1. Add a small message for your future self?\n";
+        "2. See your journal history?\n";
+        "3. Search for a particular day?\n";
+        "4. Remove a journal entry?\n";
+        "5. Remove currently displayed quote?\n";
+        "6. Exit\n";
+      ];
+    print_string [ Bold ] "Please choose an option: ";
     after_mood_input user rand_quote)
   else (
-    print_string "How are you feeling today? ";
+    print_string [ Bold ] "How are you feeling today? ";
     process_mood user)
+
+and print_strings style lines =
+  List.iter (fun line -> print_string style line) lines
 
 and process_mood user =
   let path = "data/" ^ user ^ "_mood.csv" in
@@ -57,15 +64,17 @@ and process_choice user =
   | "4" ->
       print_endline "Exiting...";
       exit 0
-  | _ ->
-      print_endline "Invalid option. Please try again.";
-      dashboard_login user
+  | _ -> dashboard_login user
 
 and dashboard_login user =
-  print_endline ("\nHello, " ^ user);
-  print_endline "1. Mood Tracker";
-  print_endline "2. Health Tracker";
-  print_endline "3. Finances Tracker";
-  print_endline "4. Exit";
-  print_string "Please choose an option: ";
+  print_string [ Reset ] "\n";
+  print_string [ Bold; Foreground Green ] ("\nHello, " ^ user ^ "\n");
+  print_strings [ Reset ]
+    [
+      "1. Mood Tracker\n";
+      "2. Health Tracker\n";
+      "3. Finances Tracker\n";
+      "4. Exit\n";
+    ];
+  print_string [ Bold ] "Please choose an option: ";
   process_choice user
