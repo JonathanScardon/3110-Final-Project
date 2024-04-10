@@ -5,7 +5,7 @@ open ANSITerminal
 let print_menu () =
   print_string [ Reset ] "\n";
 
-  print_string [ Bold ] "\nWelcome to the Daily Life Planner (DLP)\n";
+  print_string [ Bold ] "\nWelcome to OCamLife\n";
   print_string [ Reset ] "1. Login\n";
   print_string [ Reset ] "2. Register\n";
   print_string [ Reset ] "3. Delete Account\n";
