@@ -4,9 +4,6 @@ open ANSITerminal
 let print_strings style lines =
   List.iter (fun line -> print_string style line) lines
 
-(* TODO: add small pause (with Unix commands?) between displaying messages
-   and displaying the front end menus again *)
-
 (* mood interface *)
 
 let rec mood_interface user =
@@ -42,22 +39,28 @@ and after_mood_input user rand_quote =
   match choice with
   | "1" ->
       Mood.add_quote user;
+      Unix.sleep 2;
       mood_interface user
   | "2" ->
       Mood.see_history user;
+      Unix.sleep 2;
       mood_interface user
   | "3" ->
       Mood.search_entry user;
+      Unix.sleep 2;
       mood_interface user
   | "4" ->
       Mood.remove_entry user;
+      Unix.sleep 2;
       mood_interface user
   | "5" ->
       Mood.remove_curr_quote user rand_quote;
+      Unix.sleep 2;
       mood_interface user
   | "6" -> dashboard_login user
   | _ ->
       print_endline "Invalid option. Please try again.";
+      Unix.sleep 10;
       mood_interface user
 
 (* health interface *)
