@@ -29,8 +29,9 @@ let see_history user =
       print_string [ Reset ]
         "How many recent entries would you like to see? (enter a number) "
     in
+    let message2 = read_line () in
     try
-      let limit = int_of_string message in
+      let limit = int_of_string message2 in
       print_endline
         (header ^ get_data ("data/" ^ user ^ "_mood.csv") (Some limit))
     with _ ->
