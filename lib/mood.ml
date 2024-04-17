@@ -10,9 +10,11 @@ let curr_date = day ^ "-" ^ month ^ "-" ^ year
 let rec happiness_log () =
   print_string [ Reset ] "Rate your happiness 1-10: ";
   let happiness_lvl = read_line () in
-  let hap_lvl_int = int_of_string happiness_lvl in
-  if hap_lvl_int >= 1 && hap_lvl_int <= 10 then happiness_lvl
-  else happiness_log ()
+  try
+    let hap_lvl_int = int_of_string happiness_lvl in
+    if hap_lvl_int >= 1 && hap_lvl_int <= 10 then happiness_lvl
+    else happiness_log ()
+  with Failure _ -> happiness_log ()
 
 let see_history user =
   erase Screen;
