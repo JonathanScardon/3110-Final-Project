@@ -19,45 +19,63 @@ let rec happiness_log () =
 let see_history user =
   erase Screen;
   let header = "\nDate | Happiness | Mood" in
-  print_string [ Reset ] "Would you like to limit the history you see? (y/n) ";
-  if read_line () = "y" then
+  print_string [ Reset ]
+    "Type 0 to go back to the menu. \n\
+    \ Would you like to limit the history you see? (y/n) ";
+  let message = read_line () in
+  if message = "0" then ()
+  else if message = "y" then
     let () =
       print_string [ Reset ]
         "How many recent entries would you like to see? (enter a number) "
     in
-    let limit = int_of_string (read_line ()) in
+    let limit = int_of_string message in
     print_endline (header ^ get_data ("data/" ^ user ^ "_mood.csv") (Some limit))
   else print_endline (header ^ get_data ("data/" ^ user ^ "_mood.csv") None)
 
 let rec search_entry user =
   print_string [ Reset ]
-    "Enter a date in the format day-month-year (ex. 2-3-2024) ";
+    "Type 0 to go back to the menu. \n\
+    \ Enter a date in the format day-month-year (ex. 2-3-2024) ";
   let date = read_line () in
   let header = "\nDate | Happiness | Mood" in
   let path = "data/" ^ user ^ "_mood.csv" in
-  try print_endline (header ^ find_entry date path)
-  with Not_found ->
+  if date = "0" then ()
+  else if date = "" then (
     print_string [ Foreground Red ] "Sorry, this entry does not exist!\n";
-    search_entry user
+    search_entry user)
+  else
+    try print_endline (header ^ find_entry date path)
+    with Not_found ->
+      print_string [ Foreground Red ] "Sorry, this entry does not exist!\n";
+      search_entry user
 
 let rec remove_entry user =
   print_string [ Reset ]
-    "Enter a date in the format day-month-year (ex. 2-3-2024) ";
+    "Type 0 to go back to the menu. \n\
+     Enter a date in the format day-month-year (ex. 2-3-2024) ";
   let date = read_line () in
   let path = "data/" ^ user ^ "_mood.csv" in
-  try
-    remove_data path date;
-    print_string [ Foreground Green ] "Removed entry successfully.\n"
-  with Not_found ->
+  if date = "0" then ()
+  else if date = "" then (
     print_string [ Foreground Red ] "Sorry, this entry does not exist!\n";
-    remove_entry user
+    remove_entry user)
+  else
+    try
+      remove_data path date;
+      print_string [ Foreground Green ] "Removed entry successfully.\n"
+    with Not_found ->
+      print_string [ Foreground Red ] "Sorry, this entry does not exist!\n";
+      remove_entry user
 
 let add_quote user =
-  print_string [ Reset ] "Enter a message: ";
+  print_string [ Reset ] "Type 0 to go back to the menu. \nEnter a message: ";
   let message = read_line () in
-  let path = "data/" ^ user ^ "_quotes.csv" in
-  add_data [ message ] path;
-  print_string [ Foreground Green ] "Message saved successfully.\n"
+  if message = "0" then ()
+  else
+    let path = "data/" ^ user ^ "_quotes.csv" in
+    add_data [ message ] path;
+    print_string [ Foreground Green ] "Message saved successfully.\n"
 
 let get_random_quote user =
   let quotes = Csv.load ("data/" ^ user ^ "_quotes.csv") in

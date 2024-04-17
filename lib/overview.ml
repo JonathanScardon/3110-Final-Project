@@ -4,6 +4,9 @@ open ANSITerminal
 let print_strings style lines =
   List.iter (fun line -> print_string style line) lines
 
+(* TODO: add small pause (with Unix commands?) between displaying messages
+   and displaying the front end menus again *)
+
 (* mood interface *)
 
 let rec mood_interface user =
