@@ -17,7 +17,7 @@ let rec happiness_log () =
   with Failure _ -> happiness_log ()
 
 let see_history user =
-  erase Screen;
+  (* erase Screen; *)
   let header = "\nDate | Happiness | Mood" in
   print_string [ Reset ]
     "Type 0 to go back to the menu. \n\
