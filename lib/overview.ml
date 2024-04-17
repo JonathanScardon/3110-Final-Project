@@ -1,6 +1,11 @@
 open Data
 open ANSITerminal
 
+let print_strings style lines =
+  List.iter (fun line -> print_string style line) lines
+
+(* mood interface *)
+
 let rec mood_interface user =
   let path = "data/" ^ user ^ "_mood.csv" in
   print_string [ Bold; Foreground Yellow ] "\nMood Tracker\n";
@@ -17,14 +22,11 @@ let rec mood_interface user =
         "5. Remove currently displayed quote?\n";
         "6. Exit\n";
       ];
-    print_string [ Bold ] "Please choose an option: ";
+    print_string [ Bold ] "Please choose an option (1-6): ";
     after_mood_input user rand_quote)
   else (
     print_string [ Bold ] "How are you feeling today? ";
     process_mood user)
-
-and print_strings style lines =
-  List.iter (fun line -> print_string style line) lines
 
 and process_mood user =
   let path = "data/" ^ user ^ "_mood.csv" in
@@ -55,11 +57,53 @@ and after_mood_input user rand_quote =
       print_endline "Invalid option. Please try again.";
       mood_interface user
 
+(* health interface *)
+
+and health_interface user =
+  print_string [ Bold; Foreground Yellow ] "\nHealth Tracker\n";
+  print_strings [ Reset ]
+    [
+      "Would you like to:\n";
+      "1. Add to your food journal?\n";
+      "2. Add to your exercise journal?\n";
+      "3. See your journal history?\n";
+      "4. Search for a particular day?\n";
+      "5. Remove a journal entry?\n";
+      "6. Exit\n";
+    ];
+  print_string [ Bold ] "Please choose an option (1-6): ";
+  health_input user
+
+and health_input user =
+  let choice = read_line () in
+  match choice with
+  | "1" ->
+      ();
+      health_interface user
+  | "2" ->
+      ();
+      health_interface user
+  | "3" ->
+      ();
+      health_interface user
+  | "4" ->
+      ();
+      health_interface user
+  | "5" ->
+      ();
+      health_interface user
+  | "6" -> dashboard_login user
+  | _ ->
+      print_endline "Invalid option. Please try again.";
+      health_interface user
+
+(* dashboard interface *)
+
 and process_choice user =
   let choice = read_line () in
   match choice with
   | "1" -> mood_interface user
-  | "2" -> ()
+  | "2" -> health_interface user
   | "3" -> ()
   | "4" ->
       print_endline "Exiting...";
@@ -76,5 +120,5 @@ and dashboard_login user =
       "3. Finances Tracker\n";
       "4. Exit\n";
     ];
-  print_string [ Bold ] "Please choose an option: ";
+  print_string [ Bold ] "Please choose an option (1-4): ";
   process_choice user
