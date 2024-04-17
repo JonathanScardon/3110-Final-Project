@@ -29,8 +29,12 @@ let see_history user =
       print_string [ Reset ]
         "How many recent entries would you like to see? (enter a number) "
     in
-    let limit = int_of_string message in
-    print_endline (header ^ get_data ("data/" ^ user ^ "_mood.csv") (Some limit))
+    try
+      let limit = int_of_string message in
+      print_endline
+        (header ^ get_data ("data/" ^ user ^ "_mood.csv") (Some limit))
+    with _ ->
+      print_endline (header ^ get_data ("data/" ^ user ^ "_mood.csv") None)
   else print_endline (header ^ get_data ("data/" ^ user ^ "_mood.csv") None)
 
 let rec search_entry user =

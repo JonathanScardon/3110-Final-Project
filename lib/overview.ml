@@ -39,7 +39,7 @@ and after_mood_input user rand_quote =
   match choice with
   | "1" ->
       Mood.add_quote user;
-      Unix.sleep 2;
+      Unix.sleep 1;
       mood_interface user
   | "2" ->
       Mood.see_history user;
@@ -51,16 +51,16 @@ and after_mood_input user rand_quote =
       mood_interface user
   | "4" ->
       Mood.remove_entry user;
-      Unix.sleep 2;
+      Unix.sleep 1;
       mood_interface user
   | "5" ->
       Mood.remove_curr_quote user rand_quote;
-      Unix.sleep 2;
+      Unix.sleep 1;
       mood_interface user
   | "6" -> dashboard_login user
   | _ ->
       print_endline "Invalid option. Please try again.";
-      Unix.sleep 10;
+      Unix.sleep 1;
       mood_interface user
 
 (* health interface *)
