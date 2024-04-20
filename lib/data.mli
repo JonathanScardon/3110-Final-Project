@@ -16,3 +16,7 @@ val search : string -> string -> bool
 val find_entry : string -> string -> string
 (** [find_entry id path] returns the first entry with [id] as a first element, 
     contained within the CSV [path]. *)
+
+val edit : string -> string -> string -> unit
+(** [edit id path data] edits the row with [id] as a first element to contain [data], 
+    contained within the CSV [path]. If the row does not exist, then it is added to the end. *)

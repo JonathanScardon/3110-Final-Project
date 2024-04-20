@@ -46,6 +46,19 @@ let rec remove_data_list lst data =
   | [] -> raise Not_found
   | h :: t -> if contains h data then t else h :: remove_data_list t data
 
+let rec edit_data lst id data =
+  match lst with
+  | [] -> [ [ id; data ] ]
+  | h :: t -> (
+      match h with
+      | [] -> h :: edit_data t id data
+      | a :: _ -> if a = id then [ id; data ] :: t else h :: edit_data t id data
+      )
+
+let edit id path data =
+  let lst = Csv.load path in
+  Csv.save path (edit_data lst id data)
+
 let remove_data path data =
   let lst = Csv.load path in
   Csv.save path (remove_data_list lst data)
