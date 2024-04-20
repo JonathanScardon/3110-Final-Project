@@ -11,8 +11,6 @@ let credentials_path () =
         | Some "test" -> "test/test_auth.csv"
         | _ -> "data/user_credentials.csv")
   in
-  (* print_endline ("Using credentials path: " ^ path); *)
-  (* Debug print *)
   path
 
 let username_exists username =
