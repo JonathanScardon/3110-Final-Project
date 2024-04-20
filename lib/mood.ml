@@ -38,22 +38,9 @@ let see_history user =
       print_endline (header ^ get_data ("data/" ^ user ^ "_mood.csv") None)
   else print_endline (header ^ get_data ("data/" ^ user ^ "_mood.csv") None)
 
-let rec search_entry user =
-  print_string [ Reset ]
-    "Enter 'back' to go back to the menu. \n\
-    \ Enter a date in the format day-month-year (ex. 2-3-2024) ";
-  let date = read_line () in
-  let header = "\nDate | Happiness | Mood" in
-  let path = "data/" ^ user ^ "_mood.csv" in
-  if date = "back" then ()
-  else if date = "" then (
-    print_string [ Foreground Red ] "Sorry, this entry does not exist!\n";
-    search_entry user)
-  else
-    try print_endline (header ^ find_entry date path)
-    with Not_found ->
-      print_string [ Foreground Red ] "Sorry, this entry does not exist!\n";
-      search_entry user
+let search_entry user =
+  Data.search_entry user "\nDate | Happiness | Mood"
+    ("data/" ^ user ^ "_mood.csv")
 
 let rec remove_entry user =
   print_string [ Reset ]

@@ -1,3 +1,5 @@
+open ANSITerminal
+
 let add_data data path =
   try
     let sheet = Csv.load path in
@@ -72,3 +74,18 @@ let find_entry id path =
   "\n"
   ^ String.concat " " (List.find (fun row -> List.nth row 0 = id) sheet)
   ^ "\n"
+
+let rec search_entry user header path =
+  print_string [ Reset ]
+    "Enter 'back' to go back to the menu. \n\
+    \ Enter a date in the format day-month-year (ex. 2-3-2024) ";
+  let date = read_line () in
+  if date = "back" then ()
+  else if date = "" then (
+    print_string [ Foreground Red ] "Sorry, this entry does not exist!\n";
+    search_entry user header path)
+  else
+    try print_endline (header ^ find_entry date path)
+    with Not_found ->
+      print_string [ Foreground Red ] "Sorry, this entry does not exist!\n";
+      search_entry user header path

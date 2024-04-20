@@ -20,3 +20,6 @@ val find_entry : string -> string -> string
 val edit : string -> string -> string -> unit
 (** [edit id path data] edits the row with [id] as a first element to contain [data], 
     contained within the CSV [path]. If the row does not exist, then it is appended to the end. *)
+
+val search_entry : string -> string -> string -> unit
+(** TODO: write spec *)
