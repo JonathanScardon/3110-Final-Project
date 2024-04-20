@@ -10,4 +10,4 @@
   yojson
   lwt)
  (preprocess
-  (pps bisect_ppx)))
+  (pps bisect_ppx lwt_ppx)))

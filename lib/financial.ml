@@ -5,12 +5,20 @@ open Cohttp_lwt_unix
 open Yojson.Basic.Util
 open Lwt
 open Lwt.Syntax
+open Csv
 
-let api_key = "64ROAIJNDDZD98UE"
+let api_key = Sys.getenv "64ROAIJNDDZD98UE"
 let base_url = "https://www.alphavantage.co/query"
 
-let fetch_stock_data api_key symbol =
-  let base_url = "https://www.alphavantage.co/query" in
+let load_user_financials user_id =
+  let path = "data/" ^ user_id ^ "_financials.csv" in
+  Lwt.return (Csv.load path)
+
+let save_user_financials user_id data =
+  let path = "data/" ^ user_id ^ "_financials.csv" in
+  Lwt.return (Csv.save path data)
+
+let fetch_stock_data symbol =
   let uri =
     Uri.add_query_params' (Uri.of_string base_url)
       [
@@ -20,10 +28,109 @@ let fetch_stock_data api_key symbol =
         ("apikey", api_key);
       ]
   in
-  Client.get uri >>= fun (resp, body) ->
+  let%lwt resp, body = Client.get uri in
   match Cohttp.Response.status resp with
-  | `OK ->
-      Cohttp_lwt.Body.to_string body >>= fun body ->
-      let json = Yojson.Basic.from_string body in
-      Lwt.return (Some json)
-  | _ -> Lwt.return None
+  | `OK -> (
+      let%lwt body = Cohttp_lwt.Body.to_string body in
+      try
+        let json = Yojson.Basic.from_string body in
+        Lwt.return (Some json)
+      with Yojson.Json_error msg ->
+        Lwt_io.printf "JSON parsing error: %s\n" msg >>= fun () ->
+        Lwt.return None)
+  | status ->
+      let status_code = Cohttp.Code.string_of_status status in
+      Lwt_io.printf "Failed to fetch data: HTTP Status %s\n" status_code
+      >>= fun () -> Lwt.return None
+
+let update_stock_prices user_id =
+  let%lwt stocks = load_user_financials user_id in
+  let%lwt updated_stocks =
+    Lwt_list.map_s
+      (fun row ->
+        match row with
+        | symbol :: _ :: _ :: _ :: _ as stock -> (
+            match%lwt fetch_stock_data symbol with
+            | Some json ->
+                let price =
+                  Yojson.Basic.Util.(
+                    json
+                    |> member "Time Series (5min)"
+                    |> to_assoc |> List.hd |> snd |> member "4. close"
+                    |> to_string)
+                in
+                Lwt.return (List.append (List.tl stock) [ price ])
+            | None -> Lwt.return stock)
+        | _ -> Lwt.return row)
+      stocks
+  in
+  save_user_financials user_id updated_stocks
+
+let calculate_portfolio_value user_id =
+  let%lwt stocks = load_user_financials user_id in
+  let total_value =
+    List.fold_left
+      (fun acc row ->
+        match row with
+        | _ :: shares :: price :: _ ->
+            acc +. (float_of_string shares *. float_of_string price)
+        | _ -> acc)
+      0.0 stocks
+  in
+  Lwt.return total_value
+
+let add_stock user_id symbol shares purchase_price =
+  let%lwt stocks = load_user_financials user_id in
+  let new_stock =
+    [ symbol; string_of_int shares; string_of_float purchase_price; "0" ]
+  in
+  (* "0" is a placeholder for current price *)
+  save_user_financials user_id (new_stock :: stocks)
+
+let remove_stock user_id symbol =
+  let stocks = load_user_financials user_id in
+  let filtered_stocks = List.filter (fun row -> List.hd row <> symbol) stocks in
+  save_user_financials user_id filtered_stocks
+
+let modify_stock user_id index symbol shares purchase_price last_price =
+  let%lwt stocks = load_user_financials user_id in
+  let new_stocks =
+    List.mapi
+      (fun i row ->
+        if i = index then
+          [
+            symbol;
+            string_of_int shares;
+            string_of_float purchase_price;
+            string_of_float last_price;
+          ]
+        else row)
+      stocks
+  in
+  save_user_financials user_id new_stocks
+
+let update_and_calculate_changes user_id =
+  let%lwt stocks = load_user_financials user_id in
+  let%lwt updated_stocks =
+    Lwt_list.mapi_s
+      (fun i [ symbol; shares; purchase_price; last_price ] ->
+        match%lwt fetch_stock_data symbol with
+        | Some json ->
+            let new_price =
+              Yojson.Basic.Util.(
+                json
+                |> member "Time Series (5min)"
+                |> to_assoc |> List.hd |> snd |> member "4. close" |> to_float)
+            in
+            let change =
+              (new_price -. float_of_string last_price)
+              /. float_of_string last_price *. 100.0
+            in
+            Lwt_io.printf "Stock: %s, Change: %.2f%%\n" symbol change
+            >>= fun () ->
+            Lwt.return
+              [ symbol; shares; purchase_price; string_of_float new_price ]
+        | None -> Lwt.return [ symbol; shares; purchase_price; last_price ])
+      stocks
+  in
+  save_user_financials user_id updated_stocks
