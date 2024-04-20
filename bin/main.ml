@@ -58,6 +58,8 @@ and delete () =
         Final_project.Data.remove_data "data/user_credentials.csv" username;
         Sys.remove ("data/" ^ username ^ "_mood.csv");
         Sys.remove ("data/" ^ username ^ "_quotes.csv");
+        Sys.remove ("data/" ^ username ^ "_food.csv");
+        Sys.remove ("data/" ^ username ^ "_exercise.csv");
         print_endline "Account removed successfully.";
         print_menu ();
         process_choice ()
@@ -101,8 +103,8 @@ and login_failure () =
   login ()
 
 and registration_success () =
-  print_string [ Foreground Green ] "Registration successful!";
-  prompt_for_acknowledgment "Redirecting to login";
+  print_string [ Foreground Green ] "Registration successful!\n";
+  prompt_for_acknowledgment "Redirecting to login\n";
   login ()
 
 and prompt_for_acknowledgment message =

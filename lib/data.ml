@@ -52,8 +52,8 @@ let rec edit_data lst id data =
   | h :: t -> (
       match h with
       | [] -> h :: edit_data t id data
-      | a :: _ -> if a = id then [ id; data ] :: t else h :: edit_data t id data
-      )
+      | a :: b ->
+          if a = id then ([ id; data ] @ b) :: t else h :: edit_data t id data)
 
 let edit id path data =
   let lst = Csv.load path in

@@ -29,6 +29,8 @@ let add_user username hashed_password =
       Csv.save (credentials_path ())
         (credentials @ [ [ username; hashed_password ] ]);
       Csv.save ("data/" ^ username ^ "_mood.csv") [ [] ];
+      Csv.save ("data/" ^ username ^ "_food.csv") [ [] ];
+      Csv.save ("data/" ^ username ^ "_exercise.csv") [ [] ];
       Csv.save
         ("data/" ^ username ^ "_quotes.csv")
         (Csv.load "data/quotesdata.csv");

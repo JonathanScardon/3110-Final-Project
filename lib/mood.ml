@@ -20,10 +20,10 @@ let see_history user =
   (* erase Screen; *)
   let header = "\nDate | Happiness | Mood" in
   print_string [ Reset ]
-    "Type 0 to go back to the menu. \n\
+    "Enter 'back' to go back to the menu. \n\
     \ Would you like to limit the history you see? (y/n) ";
   let message = read_line () in
-  if message = "0" then ()
+  if message = "back" then ()
   else if message = "y" then
     let () =
       print_string [ Reset ]
@@ -40,12 +40,12 @@ let see_history user =
 
 let rec search_entry user =
   print_string [ Reset ]
-    "Type 0 to go back to the menu. \n\
+    "Enter 'back' to go back to the menu. \n\
     \ Enter a date in the format day-month-year (ex. 2-3-2024) ";
   let date = read_line () in
   let header = "\nDate | Happiness | Mood" in
   let path = "data/" ^ user ^ "_mood.csv" in
-  if date = "0" then ()
+  if date = "back" then ()
   else if date = "" then (
     print_string [ Foreground Red ] "Sorry, this entry does not exist!\n";
     search_entry user)
@@ -57,11 +57,11 @@ let rec search_entry user =
 
 let rec remove_entry user =
   print_string [ Reset ]
-    "Type 0 to go back to the menu. \n\
+    "Enter 'back' to go back to the menu. \n\
      Enter a date in the format day-month-year (ex. 2-3-2024) ";
   let date = read_line () in
   let path = "data/" ^ user ^ "_mood.csv" in
-  if date = "0" then ()
+  if date = "back" then ()
   else if date = "" then (
     print_string [ Foreground Red ] "Sorry, this entry does not exist!\n";
     remove_entry user)
@@ -74,9 +74,10 @@ let rec remove_entry user =
       remove_entry user
 
 let add_quote user =
-  print_string [ Reset ] "Type 0 to go back to the menu. \nEnter a message: ";
+  print_string [ Reset ]
+    "Enter 'back' to go back to the menu. \nEnter a message: ";
   let message = read_line () in
-  if message = "0" then ()
+  if message = "back" then ()
   else
     let path = "data/" ^ user ^ "_quotes.csv" in
     add_data [ message ] path;
