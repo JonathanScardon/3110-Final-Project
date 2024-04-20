@@ -88,7 +88,7 @@ let add_stock user_id symbol shares purchase_price =
   save_user_financials user_id (new_stock :: stocks)
 
 let remove_stock user_id symbol =
-  let stocks = load_user_financials user_id in
+  let%lwt stocks = load_user_financials user_id in
   let filtered_stocks = List.filter (fun row -> List.hd row <> symbol) stocks in
   save_user_financials user_id filtered_stocks
 
