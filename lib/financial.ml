@@ -7,16 +7,27 @@ open Lwt
 open Lwt.Syntax
 open Csv
 
+(* stock tracker *)
 let api_key = Sys.getenv "64ROAIJNDDZD98UE"
 let base_url = "https://www.alphavantage.co/query"
 
-let load_user_financials user_id =
-  let path = "data/" ^ user_id ^ "_financials.csv" in
-  Lwt.return (Csv.load path)
+let take n lst =
+  let rec aux n acc lst =
+    match lst with
+    | [] -> List.rev acc
+    | _ when n = 0 -> List.rev acc
+    | x :: xs -> aux (n - 1) (x :: acc) xs
+  in
+  aux n [] lst
 
-let save_user_financials user_id data =
-  let path = "data/" ^ user_id ^ "_financials.csv" in
-  Lwt.return (Csv.save path data)
+let load_user_stock_financials user_id =
+  let path = "data/" ^ user_id ^ "_stock_financials.csv" in
+  let data = Csv.load path in
+  Lwt.return (take 3 data)
+
+let save_user_stock_financials user_id data =
+  let path = "data/" ^ user_id ^ "_stock_financials.csv" in
+  Lwt.return (Csv.save path (take 3 data))
 
 let fetch_stock_data symbol =
   let uri =
@@ -44,30 +55,32 @@ let fetch_stock_data symbol =
       >>= fun () -> Lwt.return None
 
 let update_stock_prices user_id =
-  let%lwt stocks = load_user_financials user_id in
+  let%lwt stocks = load_user_stock_financials user_id in
   let%lwt updated_stocks =
-    Lwt_list.map_s
-      (fun row ->
-        match row with
-        | symbol :: _ :: _ :: _ :: _ as stock -> (
-            match%lwt fetch_stock_data symbol with
-            | Some json ->
-                let price =
-                  Yojson.Basic.Util.(
-                    json
-                    |> member "Time Series (5min)"
-                    |> to_assoc |> List.hd |> snd |> member "4. close"
-                    |> to_string)
-                in
-                Lwt.return (List.append (List.tl stock) [ price ])
-            | None -> Lwt.return stock)
-        | _ -> Lwt.return row)
+    Lwt_list.mapi_s
+      (fun i row ->
+        if i < 3 then
+          match row with
+          | symbol :: _ :: _ :: _ :: _ as stock -> (
+              match%lwt fetch_stock_data symbol with
+              | Some json ->
+                  let price =
+                    Yojson.Basic.Util.(
+                      json
+                      |> member "Time Series (5min)"
+                      |> to_assoc |> List.hd |> snd |> member "4. close"
+                      |> to_string)
+                  in
+                  Lwt.return (List.append (List.tl stock) [ price ])
+              | None -> Lwt.return stock)
+          | _ -> Lwt.return row
+        else Lwt.return row)
       stocks
   in
-  save_user_financials user_id updated_stocks
+  save_user_stock_financials user_id updated_stocks
 
 let calculate_portfolio_value user_id =
-  let%lwt stocks = load_user_financials user_id in
+  let%lwt stocks = load_user_stock_financials user_id in
   let total_value =
     List.fold_left
       (fun acc row ->
@@ -80,20 +93,19 @@ let calculate_portfolio_value user_id =
   Lwt.return total_value
 
 let add_stock user_id symbol shares purchase_price =
-  let%lwt stocks = load_user_financials user_id in
+  let%lwt stocks = load_user_stock_financials user_id in
   let new_stock =
     [ symbol; string_of_int shares; string_of_float purchase_price; "0" ]
   in
-  (* "0" is a placeholder for current price *)
-  save_user_financials user_id (new_stock :: stocks)
+  save_user_stock_financials user_id (new_stock :: stocks)
 
 let remove_stock user_id symbol =
-  let%lwt stocks = load_user_financials user_id in
+  let%lwt stocks = load_user_stock_financials user_id in
   let filtered_stocks = List.filter (fun row -> List.hd row <> symbol) stocks in
-  save_user_financials user_id filtered_stocks
+  save_user_stock_financials user_id filtered_stocks
 
 let modify_stock user_id index symbol shares purchase_price last_price =
-  let%lwt stocks = load_user_financials user_id in
+  let%lwt stocks = load_user_stock_financials user_id in
   let new_stocks =
     List.mapi
       (fun i row ->
@@ -107,10 +119,10 @@ let modify_stock user_id index symbol shares purchase_price last_price =
         else row)
       stocks
   in
-  save_user_financials user_id new_stocks
+  save_user_stock_financials user_id new_stocks
 
 let update_and_calculate_changes user_id =
-  let%lwt stocks = load_user_financials user_id in
+  let%lwt stocks = load_user_stock_financials user_id in
   let%lwt updated_stocks =
     Lwt_list.mapi_s
       (fun i [ symbol; shares; purchase_price; last_price ] ->
@@ -133,4 +145,6 @@ let update_and_calculate_changes user_id =
         | None -> Lwt.return [ symbol; shares; purchase_price; last_price ])
       stocks
   in
-  save_user_financials user_id updated_stocks
+  save_user_stock_financials user_id updated_stocks
+
+(* other financial tracker stuff *)
