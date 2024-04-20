@@ -1,4 +1,5 @@
 (executable
  (public_name ocamlife)
  (name main)
- (libraries final_project ANSITerminal))
+ (libraries final_project ANSITerminal)
+ (flags :standard -w -32))

@@ -1,5 +1,5 @@
 (library
  (name final_project)
- (libraries csv cryptokit unix ANSITerminal)
+ (libraries csv cryptokit unix ANSITerminal cohttp cohttp-lwt-unix yojson)
  (preprocess
   (pps bisect_ppx)))
