@@ -34,5 +34,6 @@ let add_health_data user journal =
       print_string [ Foreground Green ] "\nEntry added successfully!\n";
       edit curr_date path data
 
-(* food journal: meal type, time of day (automatically generated), food *)
-(* exercise journal: type of exercise, hours exercised *)
+let search_entry user =
+  (* ask user whether they want to see food or exercise journal *)
+  Data.search_entry user "" ("data/" ^ user ^ "_food.csv")
