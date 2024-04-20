@@ -1,3 +1,4 @@
+(* overview.ml *)
 open Data
 open ANSITerminal
 
@@ -84,10 +85,10 @@ and health_input user =
   let choice = read_line () in
   match choice with
   | "1" ->
-      Health.add_health_data user "food";
+      ();
       health_interface user
   | "2" ->
-      Health.add_health_data user "exercise";
+      ();
       health_interface user
   | "3" ->
       ();
@@ -130,3 +131,5 @@ and dashboard_login user =
     ];
   print_string [ Bold ] "Please choose an option (1-5): ";
   process_choice user
+
+(* financial interface *)
