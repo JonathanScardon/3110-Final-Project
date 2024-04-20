@@ -22,17 +22,17 @@ let add_health_data user journal =
   let path = "data/" ^ user ^ "_" ^ journal ^ ".csv" in
   print_string [ Reset ] ("\nEnter 'back' to go back to the menu. \n" ^ msg1);
   let input1 = read_line () in
-  (* if input1 = "back" then ()
-     else *)
-  print_string [ Reset ] ("\n" ^ msg2);
-  let input2 =
-    if journal = "exercise" then read_line () ^ " hr" else read_line ()
-  in
-  (* if input2 = "back" then ()
-     else *)
-  let data = input1 ^ "; " ^ input2 ^ "; " ^ time_of_day in
-  print_string [ Foreground Green ] "\nEntry added successfully!\n";
-  edit curr_date path data
+  if input1 = "back" then ()
+  else
+    let () = print_string [ Reset ] ("\n" ^ msg2) in
+    let input2 =
+      if journal = "exercise" then read_line () ^ " hr" else read_line ()
+    in
+    if input2 = "back" then ()
+    else
+      let data = input1 ^ "; " ^ input2 ^ "; " ^ time_of_day in
+      print_string [ Foreground Green ] "\nEntry added successfully!\n";
+      edit curr_date path data
 
 (* food journal: meal type, time of day (automatically generated), food *)
 (* exercise journal: type of exercise, hours exercised *)
