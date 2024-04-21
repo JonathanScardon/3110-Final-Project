@@ -93,7 +93,7 @@ and health_input user =
       Health.add_health_data user "exercise";
       health_interface user
   | "3" ->
-      ();
+      Health.see_history user;
       health_interface user
   | "4" ->
       Health.search_entry user;

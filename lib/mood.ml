@@ -17,30 +17,10 @@ let rec happiness_log () =
   with Failure _ -> happiness_log ()
 
 let see_history user =
-  (* erase Screen; *)
-  let header = "\nDate | Happiness | Mood" in
-  print_string [ Reset ]
-    "Enter 'back' to go back to the menu. \n\
-    \ Would you like to limit the history you see? (y/n) ";
-  let message = read_line () in
-  if message = "back" then ()
-  else if message = "y" then
-    let () =
-      print_string [ Reset ]
-        "How many recent entries would you like to see? (enter a number) "
-    in
-    let message2 = read_line () in
-    try
-      let limit = int_of_string message2 in
-      print_endline
-        (header ^ get_data ("data/" ^ user ^ "_mood.csv") (Some limit))
-    with _ ->
-      print_endline (header ^ get_data ("data/" ^ user ^ "_mood.csv") None)
-  else print_endline (header ^ get_data ("data/" ^ user ^ "_mood.csv") None)
+  Data.see_history "\nDate | Happiness | Mood" ("data/" ^ user ^ "_mood.csv")
 
 let search_entry user =
-  Data.search_entry user "\nDate | Happiness | Mood"
-    ("data/" ^ user ^ "_mood.csv")
+  Data.search_entry "\nDate | Happiness | Mood" ("data/" ^ user ^ "_mood.csv")
 
 let rec remove_entry user =
   print_string [ Reset ]

@@ -75,7 +75,7 @@ let find_entry id path =
   ^ String.concat " " (List.find (fun row -> List.nth row 0 = id) sheet)
   ^ "\n"
 
-let rec search_entry user header path =
+let rec search_entry header path =
   print_string [ Reset ]
     "\n\
      Enter 'back' to go back to the menu. \n\
@@ -84,9 +84,28 @@ let rec search_entry user header path =
   if date = "back" then ()
   else if date = "" then (
     print_string [ Foreground Red ] "Sorry, this entry does not exist!\n";
-    search_entry user header path)
+    search_entry header path)
   else
     try print_endline (header ^ find_entry date path)
     with Not_found ->
       print_string [ Foreground Red ] "Sorry, this entry does not exist!\n";
-      search_entry user header path
+      search_entry header path
+
+let see_history header path =
+  print_string [ Reset ]
+    "\n\
+     Enter 'back' to go back to the menu. \n\
+    \ Would you like to limit the history you see? (y/n) ";
+  let message = read_line () in
+  if message = "back" then ()
+  else if message = "y" then
+    let () =
+      print_string [ Reset ]
+        "\nHow many recent entries would you like to see? (enter a number) "
+    in
+    let message2 = read_line () in
+    try
+      let limit = int_of_string message2 in
+      print_endline (header ^ get_data path (Some limit))
+    with _ -> print_endline (header ^ get_data path None)
+  else print_endline (header ^ get_data path None)
