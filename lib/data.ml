@@ -127,5 +127,3 @@ let rec remove_entry path =
     with Not_found ->
       print_string [ Foreground Red ] "Sorry, this entry does not exist!\n";
       remove_entry path
-
-(**)
