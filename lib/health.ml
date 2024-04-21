@@ -34,7 +34,7 @@ let add_health_data user journal =
     in
     if input2 = "back" then ()
     else
-      let data = input1 ^ "; " ^ input2 ^ "; " ^ time_of_day in
+      let data = input1 ^ "; " ^ input2 ^ "; " ^ time_of_day ^ "\n" in
       print_string [ Foreground Green ] "\nEntry added successfully!\n";
       edit curr_date path data
 
@@ -70,4 +70,3 @@ let see_history path =
   Unix.sleep 2
 
 let remove_entry path = Data.remove_entry path
-(**)
