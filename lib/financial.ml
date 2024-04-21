@@ -1,11 +1,5 @@
-open Data
-open ANSITerminal
-open Cohttp
 open Cohttp_lwt_unix
-open Yojson.Basic.Util
 open Lwt
-open Lwt.Syntax
-open Csv
 
 (* stock tracker *)
 let api_key = Sys.getenv "64ROAIJNDDZD98UE"
@@ -121,28 +115,42 @@ let modify_stock user_id index symbol shares purchase_price last_price =
   in
   save_user_stock_financials user_id new_stocks
 
+let view_stock_spread user =
+  let%lwt stocks = load_user_stock_financials user in
+  Lwt_list.iter_s
+    (fun stock ->
+      Lwt_io.printf
+        "Stock: %s, Shares: %s, Purchase Price: $%s, Current Price: $%s\n"
+        (List.nth stock 0) (List.nth stock 1) (List.nth stock 2)
+        (List.nth stock 3))
+    stocks
+
 let update_and_calculate_changes user_id =
   let%lwt stocks = load_user_stock_financials user_id in
   let%lwt updated_stocks =
     Lwt_list.mapi_s
-      (fun _ [ symbol; shares; purchase_price; last_price ] ->
-        match%lwt fetch_stock_data symbol with
-        | Some json ->
-            let new_price =
-              Yojson.Basic.Util.(
-                json
-                |> member "Time Series (5min)"
-                |> to_assoc |> List.hd |> snd |> member "4. close" |> to_float)
-            in
-            let change =
-              (new_price -. float_of_string last_price)
-              /. float_of_string last_price *. 100.0
-            in
-            Lwt_io.printf "Stock: %s, Change: %.2f%%\n" symbol change
-            >>= fun () ->
-            Lwt.return
-              [ symbol; shares; purchase_price; string_of_float new_price ]
-        | None -> Lwt.return [ symbol; shares; purchase_price; last_price ])
+      (fun _ stock ->
+        match stock with
+        | [ symbol; shares; purchase_price; last_price ] -> (
+            match%lwt fetch_stock_data symbol with
+            | Some json ->
+                let new_price =
+                  Yojson.Basic.Util.(
+                    json
+                    |> member "Time Series (5min)"
+                    |> to_assoc |> List.hd |> snd |> member "4. close"
+                    |> to_float)
+                in
+                let change =
+                  (new_price -. float_of_string last_price)
+                  /. float_of_string last_price *. 100.0
+                in
+                Lwt_io.printf "Stock: %s, Change: %.2f%%\n" symbol change
+                >>= fun () ->
+                Lwt.return
+                  [ symbol; shares; purchase_price; string_of_float new_price ]
+            | None -> Lwt.return [ symbol; shares; purchase_price; last_price ])
+        | _ -> Lwt.return stock)
       stocks
   in
   save_user_stock_financials user_id updated_stocks
@@ -217,3 +225,39 @@ let view_wallet_spread user_id =
         balance
         (100. *. balance /. total))
     wallets
+
+let add_wallet user_id wallet_name initial_balance =
+  let%lwt wallets = load_financials user_id in
+  if List.exists (fun row -> List.hd row = wallet_name) wallets then
+    Lwt_io.printf "Wallet already exists.\n"
+  else
+    let new_wallets =
+      [ wallet_name; string_of_float initial_balance ] :: wallets
+    in
+    save_financials user_id new_wallets >>= fun () ->
+    Lwt_io.printf "Wallet added successfully.\n"
+
+let remove_wallet user_id wallet_name =
+  let%lwt wallets = load_financials user_id in
+  let exists, others =
+    List.partition (fun row -> List.hd row = wallet_name) wallets
+  in
+  match exists with
+  | [] -> Lwt_io.printf "Wallet does not exist.\n"
+  | _ ->
+      save_financials user_id others >>= fun () ->
+      Lwt_io.printf "Wallet removed successfully.\n"
+
+let log_transaction user_id wallet_name operation amount =
+  let path = "data/" ^ user_id ^ "_transactions.csv" in
+  let%lwt transactions = Lwt.return (Csv.load path) in
+  let new_entry =
+    [
+      wallet_name;
+      operation;
+      string_of_float amount;
+      string_of_float (Unix.time ());
+    ]
+  in
+  Lwt.return (Csv.save path (new_entry :: transactions)) >>= fun () ->
+  Lwt_io.printf "Transaction logged successfully.\n"
