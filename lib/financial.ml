@@ -2,7 +2,7 @@ open Cohttp_lwt_unix
 open Lwt
 
 (* stock tracker *)
-let api_key = Sys.getenv "64ROAIJNDDZD98UE"
+let api_key = "64ROAIJNDDZD98UE"
 let base_url = "https://www.alphavantage.co/query"
 
 let take n lst =
@@ -16,12 +16,13 @@ let take n lst =
 
 let load_user_stock_financials user_id =
   let path = "data/" ^ user_id ^ "_stock_financials.csv" in
-  let data = Csv.load path in
+  Lwt_preemptive.detach (fun () -> Csv.load path) () >>= fun data ->
   Lwt.return (take 3 data)
 
 let save_user_stock_financials user_id data =
   let path = "data/" ^ user_id ^ "_stock_financials.csv" in
-  Lwt.return (Csv.save path (take 3 data))
+  Lwt_preemptive.detach (fun () -> Csv.save path (take 3 data)) () >>= fun () ->
+  Lwt.return_unit
 
 let fetch_stock_data symbol =
   let uri =
@@ -33,20 +34,29 @@ let fetch_stock_data symbol =
         ("apikey", api_key);
       ]
   in
-  let%lwt resp, body = Client.get uri in
-  match Cohttp.Response.status resp with
-  | `OK -> (
-      let%lwt body = Cohttp_lwt.Body.to_string body in
-      try
-        let json = Yojson.Basic.from_string body in
-        Lwt.return (Some json)
-      with Yojson.Json_error msg ->
-        Lwt_io.printf "JSON parsing error: %s\n" msg >>= fun () ->
-        Lwt.return None)
-  | status ->
-      let status_code = Cohttp.Code.string_of_status status in
-      Lwt_io.printf "Failed to fetch data: HTTP Status %s\n" status_code
-      >>= fun () -> Lwt.return None
+  Lwt.catch
+    (fun () ->
+      let%lwt resp, body = Client.get uri in
+      match Cohttp.Response.status resp with
+      | `OK -> (
+          let%lwt body = Cohttp_lwt.Body.to_string body in
+          try
+            let json = Yojson.Basic.from_string body in
+            Lwt.return (Some json)
+          with
+          | Yojson.Json_error msg ->
+              Lwt_io.printf "JSON parsing error: %s\n" msg >>= fun () ->
+              Lwt.return None
+          | _ ->
+              Lwt_io.printf "Unexpected JSON structure.\n" >>= fun () ->
+              Lwt.return None)
+      | status ->
+          let status_code = Cohttp.Code.string_of_status status in
+          Lwt_io.printf "Failed to fetch data: HTTP Status %s\n" status_code
+          >>= fun () -> Lwt.return None)
+    (fun ex ->
+      Lwt_io.printf "Network or unexpected error: %s\n" (Printexc.to_string ex)
+      >>= fun () -> Lwt.return None)
 
 let update_stock_prices user_id =
   let%lwt stocks = load_user_stock_financials user_id in
