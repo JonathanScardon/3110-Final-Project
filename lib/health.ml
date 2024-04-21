@@ -7,7 +7,11 @@ let month = string_of_int ((Unix.localtime (Unix.time ())).tm_mon + 1)
 let year = string_of_int ((Unix.localtime (Unix.time ())).tm_year + 1900)
 let curr_date = day ^ "-" ^ month ^ "-" ^ year
 let hour = string_of_int (Unix.localtime (Unix.time ())).tm_hour
-let min = string_of_int (Unix.localtime (Unix.time ())).tm_min
+
+let min =
+  let num = (Unix.localtime (Unix.time ())).tm_min in
+  if num < 10 then "0" ^ string_of_int num else string_of_int num
+
 let time_of_day = hour ^ ":" ^ min
 
 let add_health_data user journal =
@@ -34,6 +38,6 @@ let add_health_data user journal =
       print_string [ Foreground Green ] "\nEntry added successfully!\n";
       edit curr_date path data
 
-(* let search_entry user =
-   (* ask user whether they want to see food or exercise journal *)
-   Data.search_entry user "" ("data/" ^ user ^ "_food.csv") *)
+let search_entry user =
+  (* ask user whether they want to see food or exercise journal *)
+  Data.search_entry user "" ("data/" ^ user ^ "_food.csv")

@@ -87,16 +87,17 @@ and health_input user =
   let choice = read_line () in
   match choice with
   | "1" ->
-      ();
+      Health.add_health_data user "food";
       health_interface user
   | "2" ->
-      ();
+      Health.add_health_data user "exercise";
       health_interface user
   | "3" ->
       ();
       health_interface user
   | "4" ->
-      ();
+      Health.search_entry user;
+      Unix.sleep 2;
       health_interface user
   | "5" ->
       ();
@@ -113,7 +114,7 @@ and process_choice user =
   match choice with
   | "1" -> mood_interface user
   | "2" -> health_interface user
-  | "3" -> financial_interface user
+  (* | "3" -> financial_interface user *)
   | "4" -> ()
   | "5" ->
       print_endline "Exiting...";
@@ -136,32 +137,33 @@ and dashboard_login user =
 
 (* financial interface *)
 
-and financial_interface user =
-  print_string [ Reset; Bold; Foreground Green ] "\nFinancial Tracker\n";
-  print_strings [ Reset ]
-    [
-      "1. View personal stock spread\n";
-      "2. Manage stock options\n";
-      "3. View all bank accounts\n";
-      "4. Add bank to overall wallet\n";
-      "5. Edit funds in bank wallet\n";
-      "6. Return to main menu\n";
-    ];
-  print_string [ Bold ] "Please enter a command: ";
-  financial_input user
+(* and financial_interface user =
+   print_string [ Reset; Bold; Foreground Green ] "\nFinancial Tracker\n";
+   print_strings [ Reset ]
+     [
+       "1. View personal stock spread\n";
+       "2. Manage stock options\n";
+       "3. View all bank accounts\n";
+       "4. Add bank to overall wallet\n";
+       "5. Edit funds in bank wallet\n";
+       "6. Return to main menu\n";
+     ];
+   print_string [ Bold ] "Please enter a command: ";
+   financial_input user *)
 
-and financial_input user =
-  Lwt_io.read_line Lwt_io.stdin >>= fun choice ->
-  match choice with
-  | "1" -> view_stock_spread user >>= fun () -> financial_interface user
-  | "2" -> manage_stock_options user >>= fun () -> financial_interface user
-  | "3" -> view_all_banks user >>= fun () -> financial_interface user
-  | "4" -> prompt_add_wallet user >>= fun () -> financial_interface user
-  | "5" -> prompt_edit_wallet user >>= fun () -> financial_interface user
-  | "6" -> dashboard_login user >>= fun () -> Lwt.return_unit
-  | _ ->
-      Lwt_io.printl "Invalid option. Please try again." >>= fun () ->
-      financial_interface user
+(* and financial_input user =
+   Lwt_io.read_line Lwt_io.stdin >>= fun choice ->
+   match choice with
+   | "1" -> view_stock_spread user >>= fun () -> financial_interface user
+   | "2" -> manage_stock_options user >>= fun () -> financial_interface user
+   | "3" -> view_all_banks user >>= fun () -> financial_interface user
+   | "4" -> prompt_add_wallet user >>= fun () -> financial_interface user
+   | "5" -> prompt_edit_wallet user >>= fun () -> financial_interface user
+   | "6" -> dashboard_login user >>= fun () -> Lwt.return_unit
+   | _ ->
+       Lwt_io.printl "Invalid option. Please try again." >>= fun () ->
+       financial_interface user;
+       Lwt.return_unit *)
 
 and view_all_banks user = view_wallet_spread user >>= fun () -> Lwt.return ()
 
@@ -210,7 +212,7 @@ and stock_input user =
   | "2" -> prompt_remove_stock user >>= fun () -> manage_stock_options user
   | "3" -> prompt_modify_stock user >>= fun () -> manage_stock_options user
   | "4" -> update_stock_prices user >>= fun () -> manage_stock_options user
-  | "5" -> financial_interface user
+  (* | "5" -> financial_interface user *)
   | _ ->
       Lwt_io.printl "Invalid choice. Please try again." >>= fun () ->
       manage_stock_options user
