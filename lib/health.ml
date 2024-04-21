@@ -70,3 +70,4 @@ let see_history path =
   Unix.sleep 2
 
 let remove_entry path = Data.remove_entry path
+(**)

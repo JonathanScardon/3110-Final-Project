@@ -1,3 +1,4 @@
+(* mood.ml *)
 open Data
 open ANSITerminal
 
@@ -17,18 +18,66 @@ let rec happiness_log () =
   with Failure _ -> happiness_log ()
 
 let see_history user =
-  Data.see_history "\nDate | Happiness | Mood" ("data/" ^ user ^ "_mood.csv")
+  (* erase Screen; *)
+  let header = "\nDate | Happiness | Mood" in
+  print_string [ Reset ]
+    "Type 0 to go back to the menu. \n\
+    \ Would you like to limit the history you see? (y/n) ";
+  let message = read_line () in
+  if message = "0" then ()
+  else if message = "y" then
+    let () =
+      print_string [ Reset ]
+        "How many recent entries would you like to see? (enter a number) "
+    in
+    let message2 = read_line () in
+    try
+      let limit = int_of_string message2 in
+      print_endline
+        (header ^ get_data ("data/" ^ user ^ "_mood.csv") (Some limit))
+    with _ ->
+      print_endline (header ^ get_data ("data/" ^ user ^ "_mood.csv") None)
+  else print_endline (header ^ get_data ("data/" ^ user ^ "_mood.csv") None)
 
-let search_entry user =
-  Data.search_entry "\nDate | Happiness | Mood" ("data/" ^ user ^ "_mood.csv")
+let rec search_entry user =
+  print_string [ Reset ]
+    "Type 0 to go back to the menu. \n\
+    \ Enter a date in the format day-month-year (ex. 2-3-2024) ";
+  let date = read_line () in
+  let header = "\nDate | Happiness | Mood" in
+  let path = "data/" ^ user ^ "_mood.csv" in
+  if date = "0" then ()
+  else if date = "" then (
+    print_string [ Foreground Red ] "Sorry, this entry does not exist!\n";
+    search_entry user)
+  else
+    try print_endline (header ^ find_entry date path)
+    with Not_found ->
+      print_string [ Foreground Red ] "Sorry, this entry does not exist!\n";
+      search_entry user
 
-let remove_entry user = Data.remove_entry ("data/" ^ user ^ "_mood.csv")
+let rec remove_entry user =
+  print_string [ Reset ]
+    "Type 0 to go back to the menu. \n\
+     Enter a date in the format day-month-year (ex. 2-3-2024) ";
+  let date = read_line () in
+  let path = "data/" ^ user ^ "_mood.csv" in
+  if date = "0" then ()
+  else if date = "" then (
+    print_string [ Foreground Red ] "Sorry, this entry does not exist!\n";
+    remove_entry user)
+  else
+    try
+      remove_data path date;
+      print_string [ Foreground Green ] "Removed entry successfully.\n"
+    with Not_found ->
+      print_string [ Foreground Red ] "Sorry, this entry does not exist!\n";
+      remove_entry user
 
 let add_quote user =
-  print_string [ Reset ]
-    "Enter 'back' to go back to the menu. \nEnter a message: ";
+  print_string [ Reset ] "Type 0 to go back to the menu. \nEnter a message: ";
   let message = read_line () in
-  if message = "back" then ()
+  if message = "0" then ()
   else
     let path = "data/" ^ user ^ "_quotes.csv" in
     add_data [ message ] path;

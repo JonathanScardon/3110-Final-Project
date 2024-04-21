@@ -77,3 +77,4 @@ let authenticate username password =
       stored_username = username
       && stored_hashed_password = hash_password password)
     credentials
+(**)
