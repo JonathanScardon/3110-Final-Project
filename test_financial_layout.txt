@@ -1,0 +1,47 @@
+Overall Balance: $val
+
+Tracked Stocks: S1: $val, S2: $val, S3: $val, S4: $val, S5: $val
+
+Hello, [user]. Welcome to your Financial Tracker
+Please input an option to the command line to navigate:
+1) View personal stock spread
+2) Manage stock options
+3) View all banks
+4) Add bank to overall wallet
+5) Edit funds in bank wallet
+6) ...
+(more options for future)
+0) Exit back
+
+Please enter a command: 1
+
+(*ignore the layout here like this, format in a better column|row format)
+Symbol,Name,Shares Owned,Purchase Price,Current Price
+AAPL,Apple Inc,0,0,0
+GOOGL,Alphabet Inc,0,0,0
+
+Please input an option to the command line to navigate:
+1) Manage stock options
+2) Exit back
+
+Please enter a command: 2
+
+Overall Balance: $val
+
+Tracked Stocks: S1: $val, S2: $val, S3: $val, S4: $val, S5: $val
+
+Hello, [user]. Welcome to your Financial Tracker
+Please input an option to the command line to navigate:
+1) View personal stock spread
+2) Manage stock options
+3) View all banks
+4) Add bank to overall wallet
+5) Edit funds in bank wallet
+6) ...
+(more options for future)
+0) Exit back
+
+Please enter a command: 0
+
+Main menu logic...
+
