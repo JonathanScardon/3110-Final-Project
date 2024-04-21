@@ -38,12 +38,9 @@ let add_health_data user journal =
       print_string [ Foreground Green ] "\nEntry added successfully!\n";
       edit curr_date path data
 
-let rec search_entry user =
+let rec select_journal user func msg =
   let () =
-    print_string []
-      "\n\
-       Enter 'back' to go back to the menu. \n\
-       Would you like to search in your food or exercise journal? "
+    print_string [] ("\nEnter 'back' to go back to the menu. \n " ^ msg)
   in
   let input = read_line () in
   if input = "back" then ()
@@ -51,45 +48,23 @@ let rec search_entry user =
     String.lowercase_ascii input = "food"
     || String.lowercase_ascii input = "food journal"
   then (
-    Data.search_entry "" ("data/" ^ user ^ "_food.csv");
+    func ("data/" ^ user ^ "_food.csv");
     Unix.sleep 2)
   else if
     String.lowercase_ascii input = "exercise"
     || String.lowercase_ascii input = "exercise journal"
   then (
-    Data.search_entry "" ("data/" ^ user ^ "_exercise.csv");
+    func ("data/" ^ user ^ "_exercise.csv");
     Unix.sleep 2)
   else
     let () =
       print_string [ Foreground Red ]
         "\nPlease choose between your food or exercise journal.\n"
     in
-    search_entry user
+    select_journal user func msg
 
-let rec see_history user =
-  let () =
-    print_string []
-      "\n\
-       Enter 'back' to go back to the menu. \n\
-       Would you like to see your food or exercise journal? "
-  in
-  let input = read_line () in
-  if input = "back" then ()
-  else if
-    String.lowercase_ascii input = "food"
-    || String.lowercase_ascii input = "food journal"
-  then (
-    Data.see_history "" ("data/" ^ user ^ "_food.csv");
-    Unix.sleep 2)
-  else if
-    String.lowercase_ascii input = "exercise"
-    || String.lowercase_ascii input = "exercise journal"
-  then (
-    Data.see_history "" ("data/" ^ user ^ "_exercise.csv");
-    Unix.sleep 2)
-  else
-    let () =
-      print_string [ Foreground Red ]
-        "\nPlease choose between your food or exercise journal.\n"
-    in
-    see_history user
+let search_entry path = Data.search_entry "" path
+
+let see_history path =
+  Data.see_history "" path;
+  Unix.sleep 2

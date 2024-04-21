@@ -109,3 +109,21 @@ let see_history header path =
       print_endline (header ^ get_data path (Some limit))
     with _ -> print_endline (header ^ get_data path None)
   else print_endline (header ^ get_data path None)
+
+let rec remove_entry path =
+  print_string [ Reset ]
+    "\n\
+     Enter 'back' to go back to the menu. \n\
+     Enter a date in the format day-month-year (ex. 2-3-2024) ";
+  let date = read_line () in
+  if date = "back" then ()
+  else if date = "" then (
+    print_string [ Foreground Red ] "\nSorry, this entry does not exist!\n";
+    remove_entry path)
+  else
+    try
+      remove_data path date;
+      print_string [ Foreground Green ] "Removed entry successfully.\n"
+    with Not_found ->
+      print_string [ Foreground Red ] "Sorry, this entry does not exist!\n";
+      remove_entry path

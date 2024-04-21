@@ -93,10 +93,12 @@ and health_input user =
       Health.add_health_data user "exercise";
       health_interface user
   | "3" ->
-      Health.see_history user;
+      Health.select_journal user Health.see_history
+        "Would you like to see your food or exercise journal? ";
       health_interface user
   | "4" ->
-      Health.search_entry user;
+      Health.select_journal user Health.search_entry
+        "Would you like to search in your food or exercise journal? ";
       health_interface user
   | "5" ->
       ();

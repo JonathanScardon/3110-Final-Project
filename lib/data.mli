@@ -26,3 +26,6 @@ val search_entry : string -> string -> unit
 
 val see_history : string -> string -> unit
 (** TODO: write spec *)
+
+val remove_entry : string -> unit
+(** TODO: write spec *)
