@@ -68,3 +68,5 @@ let search_entry path = Data.search_entry "" path
 let see_history path =
   Data.see_history "" path;
   Unix.sleep 2
+
+let remove_entry path = Data.remove_entry path

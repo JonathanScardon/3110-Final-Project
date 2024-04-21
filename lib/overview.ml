@@ -101,7 +101,8 @@ and health_input user =
         "Would you like to search in your food or exercise journal? ";
       health_interface user
   | "5" ->
-      ();
+      Health.select_journal user Health.remove_entry
+        "Would you like to delete an entry in your food or exercise journal? ";
       health_interface user
   | "6" -> dashboard_login user
   | _ ->
