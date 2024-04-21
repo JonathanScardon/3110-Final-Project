@@ -113,7 +113,7 @@ and process_choice user =
   match choice with
   | "1" -> mood_interface user
   | "2" -> health_interface user
-  | "3" -> ()
+  | "3" -> financial_interface user
   | "4" -> ()
   | "5" ->
       print_endline "Exiting...";
@@ -151,14 +151,14 @@ and financial_interface user =
   financial_input user
 
 and financial_input user =
-  let choice = read_line () in
+  Lwt_io.read_line Lwt_io.stdin >>= fun choice ->
   match choice with
   | "1" -> view_stock_spread user >>= fun () -> financial_interface user
   | "2" -> manage_stock_options user >>= fun () -> financial_interface user
   | "3" -> view_all_banks user >>= fun () -> financial_interface user
   | "4" -> prompt_add_wallet user >>= fun () -> financial_interface user
   | "5" -> prompt_edit_wallet user >>= fun () -> financial_interface user
-  | "6" -> Lwt.return (dashboard_login user)
+  | "6" -> dashboard_login user >>= fun () -> Lwt.return_unit
   | _ ->
       Lwt_io.printl "Invalid option. Please try again." >>= fun () ->
       financial_interface user
