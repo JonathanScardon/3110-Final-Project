@@ -6,7 +6,7 @@ let print_menu () =
   print_endline "1. Login";
   print_endline "2. Register";
   print_endline "3. Exit";
-  print_string "Please choose an option: "
+  print_string "Please choose a number: "
 
 let rec process_choice () =
   let choice = read_line () in
