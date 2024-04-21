@@ -77,7 +77,8 @@ let find_entry id path =
 
 let rec search_entry user header path =
   print_string [ Reset ]
-    "Enter 'back' to go back to the menu. \n\
+    "\n\
+     Enter 'back' to go back to the menu. \n\
     \ Enter a date in the format day-month-year (ex. 2-3-2024) ";
   let date = read_line () in
   if date = "back" then ()

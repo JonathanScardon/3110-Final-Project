@@ -38,6 +38,30 @@ let add_health_data user journal =
       print_string [ Foreground Green ] "\nEntry added successfully!\n";
       edit curr_date path data
 
-let search_entry user =
-  (* ask user whether they want to see food or exercise journal *)
-  Data.search_entry user "" ("data/" ^ user ^ "_food.csv")
+let rec search_entry user =
+  let () =
+    print_string []
+      "\n\
+       Enter 'back' to go back to the menu. \n\
+       Would you like to see your food or exercise journal? "
+  in
+  let input = read_line () in
+  if input = "back" then ()
+  else if
+    String.lowercase_ascii input = "food"
+    || String.lowercase_ascii input = "food journal"
+  then (
+    Data.search_entry user "" ("data/" ^ user ^ "_food.csv");
+    Unix.sleep 2)
+  else if
+    String.lowercase_ascii input = "exercise"
+    || String.lowercase_ascii input = "exercise journal"
+  then (
+    Data.search_entry user "" ("data/" ^ user ^ "_exercise.csv");
+    Unix.sleep 2)
+  else
+    let () =
+      print_string [ Foreground Red ]
+        "\nPlease choose between your food or exercise journal.\n"
+    in
+    search_entry user

@@ -97,7 +97,6 @@ and health_input user =
       health_interface user
   | "4" ->
       Health.search_entry user;
-      Unix.sleep 2;
       health_interface user
   | "5" ->
       ();
