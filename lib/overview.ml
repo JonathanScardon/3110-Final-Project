@@ -4,6 +4,7 @@ open ANSITerminal
 
 (* open Lwt *)
 open Financial
+open Financial_stock
 
 let print_strings style lines =
   List.iter (fun line -> print_string style line) lines
@@ -156,8 +157,9 @@ and financial_interface user =
 and financial_input user =
   let choice = read_line () in
   match choice with
-  (* | "1" -> view_stock_spread user >>= fun () -> financial_interface user
-     | "2" -> manage_stock_options user >>= fun () -> financial_interface user *)
+  | "1" ->
+      manage_stock_options user;
+      financial_interface user
   | "2" ->
       view_all_banks user;
       financial_interface user
@@ -197,68 +199,64 @@ and prompt_edit_wallet user =
   in
   adjust_wallet_balance user wallet_name op (float_of_string amount)
 
-and stock_interface user =
-  print_string [ Reset; Bold; Foreground Green ] "\nStock Tracker\n";
+and manage_stock_options user =
+  print_string [ Reset; Bold; Foreground Blue ] "\nStock Management\n";
   print_strings [ Reset ]
     [
-      "1. View personal stock spread\n";
-      "2. View all bank accounts\n";
-      "3. Add bank to overall wallet\n";
-      "4. Edit funds in bank wallet\n";
-      "5. Return to main menu\n";
+      "1. Add a new stock\n";
+      "2. Remove a stock\n";
+      "3. Modify a stock\n";
+      "4. Update stock prices\n";
+      "5. Return to financial menu\n";
     ];
-  print_string [ Bold ] "Please enter a command: ";
-  financial_input user
+  print_string [ Bold ] "Select an option: ";
+  stock_input user
 
-(* and manage_stock_options user =
-     print_string [ Reset; Bold; Foreground Blue ] "\nStock Management\n";
-     print_strings [ Reset ]
-       [
-         "1. Add a new stock\n";
-         "2. Remove a stock\n";
-         "3. Modify a stock\n";
-         "4. Update stock prices\n";
-         "5. Return to financial menu\n";
-       ];
-     print_string [ Bold ] "Select an option: ";
-     stock_input user
+and stock_input user =
+  let choice = read_line () in
+  match choice with
+  | "1" ->
+      prompt_add_stock user;
+      manage_stock_options user
+  | "2" ->
+      prompt_remove_stock user;
+      manage_stock_options user
+  | "3" ->
+      prompt_modify_stock user;
+      manage_stock_options user
+  | "4" ->
+      update_stock_prices user;
+      manage_stock_options user
+  | "5" -> financial_interface user
+  | _ ->
+      print_endline "Invalid choice. Please try again.";
+      manage_stock_options user
 
-   and stock_input user =
-     let choice = read_line () in
-     match choice with
-     | "1" -> prompt_add_stock user >>= fun () -> manage_stock_options user
-     | "2" -> prompt_remove_stock user >>= fun () -> manage_stock_options user
-     | "3" -> prompt_modify_stock user >>= fun () -> manage_stock_options user
-     | "4" -> update_stock_prices user >>= fun () -> manage_stock_options user
-     (* | "5" -> financial_interface user *)
-     | _ ->
-         Lwt_io.printl "Invalid choice. Please try again." >>= fun () ->
-         manage_stock_options user
+and prompt_add_stock user =
+  let () = print_endline "Enter stock symbol: " in
+  let symbol = read_line () in
+  let () = print_endline "Enter number of shares: " in
+  let shares = read_line () in
+  let () = print_endline "Enter purchase price: " in
+  let price = read_line () in
+  add_stock user symbol (int_of_string shares) (float_of_string price)
 
-   and prompt_add_stock user =
-     Lwt_io.printl "Enter stock symbol: " >>= fun () ->
-     Lwt_io.read_line Lwt_io.stdin >>= fun symbol ->
-     Lwt_io.printl "Enter number of shares: " >>= fun () ->
-     Lwt_io.read_line Lwt_io.stdin >>= fun shares ->
-     Lwt_io.printl "Enter purchase price: " >>= fun () ->
-     Lwt_io.read_line Lwt_io.stdin >>= fun price ->
-     add_stock user symbol (int_of_string shares) (float_of_string price)
+and prompt_remove_stock user =
+  let () = print_endline "Enter stock symbol to remove: " in
+  let symbol = read_line () in
+  remove_stock user symbol
 
-   and prompt_remove_stock user =
-     Lwt_io.printl "Enter stock symbol to remove: " >>= fun () ->
-     Lwt_io.read_line Lwt_io.stdin >>= fun symbol -> remove_stock user symbol
-
-   and prompt_modify_stock user =
-     Lwt_io.printl "Enter stock index to modify: " >>= fun () ->
-     Lwt_io.read_line Lwt_io.stdin >>= fun index ->
-     Lwt_io.printl "Enter new stock symbol: " >>= fun () ->
-     Lwt_io.read_line Lwt_io.stdin >>= fun symbol ->
-     Lwt_io.printl "Enter new number of shares: " >>= fun () ->
-     Lwt_io.read_line Lwt_io.stdin >>= fun shares ->
-     Lwt_io.printl "Enter new purchase price: " >>= fun () ->
-     Lwt_io.read_line Lwt_io.stdin >>= fun price ->
-     Lwt_io.printl "Enter last known price: " >>= fun () ->
-     Lwt_io.read_line Lwt_io.stdin >>= fun last_price ->
-     modify_stock user (int_of_string index) symbol (int_of_string shares)
-       (float_of_string price)
-       (float_of_string last_price) *)
+and prompt_modify_stock user =
+  let () = print_endline "Enter stock index to modify: " in
+  let index = read_line () in
+  let () = print_endline "Enter new stock symbol: " in
+  let symbol = read_line () in
+  let () = print_endline "Enter new number of shares: " in
+  let shares = read_line () in
+  let () = print_endline "Enter new purchase price: " in
+  let price = read_line () in
+  let () = print_endline "Enter last known price: " in
+  let last_price = read_line () in
+  modify_stock user (int_of_string index) symbol (int_of_string shares)
+    (float_of_string price)
+    (float_of_string last_price)

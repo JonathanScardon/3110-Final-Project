@@ -7,6 +7,7 @@
   ANSITerminal
   cohttp
   cohttp-lwt-unix
+  curl
   yojson
   lwt)
  (preprocess
