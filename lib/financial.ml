@@ -125,7 +125,7 @@ let update_and_calculate_changes user_id =
   let%lwt stocks = load_user_stock_financials user_id in
   let%lwt updated_stocks =
     Lwt_list.mapi_s
-      (fun i [ symbol; shares; purchase_price; last_price ] ->
+      (fun _ [ symbol; shares; purchase_price; last_price ] ->
         match%lwt fetch_stock_data symbol with
         | Some json ->
             let new_price =
@@ -148,3 +148,72 @@ let update_and_calculate_changes user_id =
   save_user_stock_financials user_id updated_stocks
 
 (* other financial tracker stuff *)
+
+let load_financials user_id =
+  let path = "data/" ^ user_id ^ "_financicoals.csv" in
+  let data = Csv.load path in
+  Lwt.return data
+
+let save_financials user_id data =
+  let path = "data/" ^ user_id ^ "_financials.csv" in
+  Csv.save path data |> Lwt.return
+
+let modify_wallet user_id wallet_name amount =
+  let%lwt wallets = load_financials user_id in
+  let exists, others =
+    List.partition (fun row -> List.hd row = wallet_name) wallets
+  in
+  let new_wallets =
+    match exists with
+    | [] -> [ wallet_name; string_of_float amount ] :: wallets
+    | [ existing ] ->
+        [
+          wallet_name;
+          string_of_float (float_of_string (List.nth existing 1) +. amount);
+        ]
+        :: others
+    | _ -> wallets
+  in
+  save_financials user_id new_wallets
+
+type balance_operation = Add | Subtract | Set
+
+let adjust_wallet_balance user_id wallet_name operation amount =
+  let%lwt wallets = load_financials user_id in
+  let exists, others =
+    List.partition (fun row -> List.hd row = wallet_name) wallets
+  in
+  let new_wallets =
+    match exists with
+    | [ existing ] ->
+        let current_balance = float_of_string (List.nth existing 1) in
+        let new_balance =
+          match operation with
+          | Add -> current_balance +. amount
+          | Subtract -> current_balance -. amount
+          | Set -> amount
+        in
+        [ wallet_name; string_of_float new_balance ] :: others
+    | [] ->
+        if operation = Set then
+          [ wallet_name; string_of_float amount ] :: wallets
+        else failwith "Wallet does not exist, cannot add or subtract."
+    | _ -> wallets
+  in
+  save_financials user_id new_wallets
+
+let view_wallet_spread user_id =
+  let%lwt wallets = load_financials user_id in
+  let total =
+    List.fold_left
+      (fun acc row -> acc +. float_of_string (List.nth row 1))
+      0.0 wallets
+  in
+  Lwt_list.iter_s
+    (fun row ->
+      let name = List.hd row in
+      let balance = float_of_string (List.nth row 1) in
+      Lwt_io.printf "%s holds $%.2f, which is %.2f%% of total funds.\n" name
+        balance
+        (100. *. balance /. total))
+    wallets
