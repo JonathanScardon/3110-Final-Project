@@ -223,16 +223,21 @@ let view_wallet_spread user_id =
   let wallets = load_financials user_id in
   let total =
     List.fold_left
-      (fun acc row -> acc +. float_of_string (List.nth row 1))
+      (fun acc row ->
+        match row with _ :: amt :: _ -> acc +. float_of_string amt | _ -> acc)
       0.0 wallets
   in
+
   List.iter
     (fun row ->
-      let name = List.hd row in
-      let balance = float_of_string (List.nth row 1) in
-      Printf.printf "%s holds $%.2f, which is %.2f%% of total funds.\n" name
-        balance
-        (100. *. balance /. total))
+      match row with
+      | _ :: amt :: _ ->
+          let name = List.hd row in
+          let balance = float_of_string amt in
+          Printf.printf "%s holds $%.2f, which is %.2f%% of total funds.\n" name
+            balance
+            (100. *. balance /. total)
+      | _ -> ())
     wallets
 
 let add_wallet user_id wallet_name initial_balance =
