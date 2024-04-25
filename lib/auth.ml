@@ -43,6 +43,9 @@ let add_user username hashed_password =
       create_user_file ("data/" ^ username ^ "_mood.csv") [ [] ];
       create_user_file ("data/" ^ username ^ "_food.csv") [ [] ];
       create_user_file ("data/" ^ username ^ "_exercise.csv") [ [] ];
+      create_user_file ("data/" ^ username ^ "_breakfast.csv") [];
+      create_user_file ("data/" ^ username ^ "_lunch.csv") [];
+      create_user_file ("data/" ^ username ^ "_dinner.csv") [];
       create_user_file ("data/" ^ username ^ "_financials.csv") [ [] ];
       (* Check for the existence of default files before copying *)
       let copy_defaults src_file dest_file =
@@ -56,6 +59,9 @@ let add_user username hashed_password =
       copy_defaults "data/stock_financials.csv"
         ("data/" ^ username ^ "_stock_financials.csv");
       copy_defaults "data/quotesdata.csv" ("data/" ^ username ^ "_quotes.csv");
+      copy_defaults "data/breakfast.csv" ("data/" ^ username ^ "_breakfast.csv");
+      copy_defaults "data/lunch.csv" ("data/" ^ username ^ "_lunch.csv");
+      copy_defaults "data/dinner.csv" ("data/" ^ username ^ "_dinner.csv");
       true
   with
   | Sys_error msg ->

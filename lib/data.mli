@@ -29,3 +29,6 @@ val see_history : string -> string -> unit
 
 val remove_entry : string -> unit
 (** TODO: write spec *)
+
+val data_to_list : string -> string list
+(** Converts CSV data from [path] into a single list. *)

@@ -36,6 +36,8 @@ let get_data path limit =
               sheet ""
           ^ "\n")
 
+let data_to_list path = List.concat (Csv.load path)
+
 (* modify, data analysis, erase all data *)
 
 let rec contains lst elm =

@@ -70,3 +70,24 @@ let see_history path =
   Unix.sleep 2
 
 let remove_entry path = Data.remove_entry path
+
+(** Generates a meal from a list, [meals], of meal ideas with name [name]. *)
+let generate_meal name meals =
+  print_endline (name ^ ":");
+  print_endline (List.nth meals (Random.int (List.length meals)))
+
+let rec mealplan user n =
+  let mealplan_day breakfast lunch dinner =
+    let () = print_endline "\n" in
+    let () = generate_meal "breakfast" breakfast in
+    let () = generate_meal "lunch" lunch in
+    let () = generate_meal "dinner" dinner in
+    print_endline "\n"
+  in
+  let breakfast = data_to_list ("data/" ^ user ^ "_breakfast.csv") in
+  let lunch = data_to_list ("data/" ^ user ^ "_lunch.csv") in
+  let dinner = data_to_list ("data/" ^ user ^ "_dinner.csv") in
+  if n = 1 then mealplan_day breakfast lunch dinner
+  else (
+    mealplan_day breakfast lunch dinner;
+    mealplan user (n - 1))

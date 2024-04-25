@@ -80,9 +80,10 @@ and health_interface user =
       "3. See your journal history?\n";
       "4. Search for a particular day?\n";
       "5. Remove a journal entry?\n";
-      "6. Exit\n";
+      "6. Make a meal plan?\n";
+      "7. Exit\n";
     ];
-  print_string [ Bold ] "Please choose an option (1-6): ";
+  print_string [ Bold ] "Please choose an option (1-7): ";
   health_input user
 
 and health_input user =
@@ -106,10 +107,57 @@ and health_input user =
       Health.select_journal user Health.remove_entry
         "Would you like to delete an entry in your food or exercise journal? ";
       health_interface user
-  | "6" -> dashboard_login user
+  | "6" ->
+      mealplan_interface user;
+      health_interface user
+  | "7" -> dashboard_login user
   | _ ->
       print_endline "Invalid option. Please try again.";
       health_interface user
+
+and mealplan_interface user =
+  print_string [ Bold; Foreground Blue ] "\nMeal Planner\n";
+  print_strings [ Reset ]
+    [
+      "Would you like to:\n";
+      "1. Generate a meal plan?\n";
+      "2. Add meal ideas?\n";
+      "3. Remove meal ideas?\n";
+      "4. Exit\n";
+    ];
+  print_string [ Bold ] "Please choose an option (1-3): ";
+  meal_input user
+
+and meal_input user =
+  let choice = read_line () in
+  match choice with
+  | "1" ->
+      Health.mealplan user (get_n_days ());
+      Unix.sleep 2;
+      mealplan_interface user
+  | "2" ->
+      ();
+      health_interface user
+  | "3" ->
+      ();
+      health_interface user
+  | "4" -> health_interface user
+  | _ ->
+      print_endline "Invalid option. Please try again.";
+      mealplan_interface user
+
+and get_n_days () =
+  print_string [ Reset ] "How many days would you like to meal plan? ";
+  let days = read_line () in
+  try
+    let n = int_of_string days in
+    if n > 0 then n
+    else (
+      print_string [ Foreground Red ] "\nSorry, this number is invalid!\n";
+      get_n_days ())
+  with _ ->
+    print_string [ Foreground Red ] "\nSorry, this number is invalid!\n";
+    get_n_days ()
 
 (* dashboard interface *)
 
