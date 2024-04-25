@@ -87,7 +87,10 @@ let rec mealplan user n =
   let breakfast = data_to_list ("data/" ^ user ^ "_breakfast.csv") in
   let lunch = data_to_list ("data/" ^ user ^ "_lunch.csv") in
   let dinner = data_to_list ("data/" ^ user ^ "_dinner.csv") in
-  if n = 1 then mealplan_day breakfast lunch dinner
+  if breakfast = [] || lunch = [] || dinner = [] then
+    print_string [ Foreground Red ]
+      "\nPlease add more meal ideas! You do not have enough right now.\n"
+  else if n = 1 then mealplan_day breakfast lunch dinner
   else (
     mealplan_day breakfast lunch dinner;
     mealplan user (n - 1))
