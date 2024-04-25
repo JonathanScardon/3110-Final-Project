@@ -12,3 +12,5 @@ val mealplan : string -> int -> unit
 
 val add_meal : string -> unit
 (** Adds a meal to the user's breakfast, lunch, or dinner CSV. *)
+
+val remove_meal : string -> unit

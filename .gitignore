@@ -1,4 +1,5 @@
 _build/
 _opam/
 data/*.csv
-*.DS_Store
+*.coverage
+.DS_Store

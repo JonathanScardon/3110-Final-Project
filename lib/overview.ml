@@ -139,8 +139,8 @@ and meal_input user =
       Health.add_meal user;
       mealplan_interface user
   | "3" ->
-      ();
-      health_interface user
+      Health.remove_meal user;
+      mealplan_interface user
   | "4" -> health_interface user
   | _ ->
       print_endline "Invalid option. Please try again.";

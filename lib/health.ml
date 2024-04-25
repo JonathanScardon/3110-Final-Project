@@ -112,3 +112,31 @@ let rec add_meal user =
       print_string [ Foreground Red ]
         "\nInvalid meal type. Please enter breakfast, lunch, or dinner.\n";
       add_meal user
+
+let rec remove_meal_entry path =
+  let () = print_string [ Reset ] "\nEnter meal to remove: " in
+  let message2 = read_line () in
+  if message2 = "back" then ()
+  else
+    try
+      remove_data path message2;
+      print_string [ Foreground Green ] "\nRemoved meal successfully.\n"
+    with Not_found ->
+      print_string [ Foreground Red ] "\nSorry, this meal does not exist!\n";
+      remove_meal_entry path
+
+let rec remove_meal user =
+  print_string [ Reset ]
+    "\n\
+     Enter 'back' to go back to the menu. \n\
+     Enter type of meal (breakfast, lunch, or dinner): ";
+  let message = read_line () in
+  match message with
+  | "back" -> ()
+  | ("breakfast" | "lunch" | "dinner") as meal ->
+      let path = "data/" ^ user ^ "_" ^ meal ^ ".csv" in
+      remove_meal_entry path
+  | _ ->
+      print_string [ Foreground Red ]
+        "\nInvalid meal type. Please enter breakfast, lunch, or dinner.\n";
+      remove_meal user
