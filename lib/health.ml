@@ -116,6 +116,23 @@ let rec add_meal user =
         "\nInvalid meal type. Please enter breakfast, lunch, or dinner.\n";
       add_meal user
 
+let rec view_meal user =
+  print_string [ Reset ]
+    "\n\
+     Enter 'back' to go back to the menu. \n\
+     Enter type of meal (breakfast, lunch, or dinner): ";
+  let message = read_line () in
+  match message with
+  | "back" -> ()
+  | ("breakfast" | "lunch" | "dinner") as meal ->
+      let path = "data/" ^ user ^ "_" ^ meal ^ ".csv" in
+      print_endline ("\n" ^ meal ^ "\n" ^ get_data path None);
+      Unix.sleep 2
+  | _ ->
+      print_string [ Foreground Red ]
+        "\nInvalid meal type. Please enter breakfast, lunch, or dinner.\n";
+      view_meal user
+
 let rec remove_meal_entry path =
   let () = print_string [ Reset ] "\nEnter meal to remove: " in
   let message2 = read_line () in

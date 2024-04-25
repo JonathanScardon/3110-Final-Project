@@ -123,9 +123,10 @@ and mealplan_interface user =
       "1. Generate a meal plan?\n";
       "2. Add meal ideas?\n";
       "3. Remove meal ideas?\n";
-      "4. Exit\n";
+      "4. View meal ideas?\n";
+      "5. Exit\n";
     ];
-  print_string [ Bold ] "Please choose an option (1-3): ";
+  print_string [ Bold ] "Please choose an option (1-5): ";
   meal_input user
 
 and meal_input user =
@@ -141,7 +142,10 @@ and meal_input user =
   | "3" ->
       Health.remove_meal user;
       mealplan_interface user
-  | "4" -> health_interface user
+  | "4" ->
+      Health.view_meal user;
+      mealplan_interface user
+  | "5" -> health_interface user
   | _ ->
       print_endline "Invalid option. Please try again.";
       mealplan_interface user

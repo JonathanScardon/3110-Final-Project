@@ -14,3 +14,7 @@ val add_meal : string -> unit
 (** Adds a meal to the user's breakfast, lunch, or dinner CSV. *)
 
 val remove_meal : string -> unit
+(** Removes a meal from the user's breakfast, lunch, or dinner CSV. *)
+
+val view_meal : string -> unit
+(** Prints meals from the user's breakfast, lunch, or dinner CSV. *)
