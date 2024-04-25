@@ -78,11 +78,11 @@ let generate_meal name meals =
 
 let rec mealplan user n =
   let mealplan_day breakfast lunch dinner =
-    let () = print_endline "\n" in
+    let () = print_endline "" in
     let () = generate_meal "breakfast" breakfast in
     let () = generate_meal "lunch" lunch in
     let () = generate_meal "dinner" dinner in
-    print_endline "\n"
+    print_endline ""
   in
   let breakfast = data_to_list ("data/" ^ user ^ "_breakfast.csv") in
   let lunch = data_to_list ("data/" ^ user ^ "_lunch.csv") in
@@ -91,3 +91,24 @@ let rec mealplan user n =
   else (
     mealplan_day breakfast lunch dinner;
     mealplan user (n - 1))
+
+let rec add_meal user =
+  print_string [ Reset ]
+    "\n\
+     Enter 'back' to go back to the menu. \n\
+     Enter type of meal (breakfast, lunch, or dinner): ";
+  let message = read_line () in
+  match message with
+  | "back" -> ()
+  | ("breakfast" | "lunch" | "dinner") as meal ->
+      let path = "data/" ^ user ^ "_" ^ meal ^ ".csv" in
+      let () = print_string [ Reset ] "\nEnter meal idea: " in
+      let message2 = read_line () in
+      if message2 = "back" then ()
+      else (
+        add_data [ message2 ] path;
+        print_string [ Foreground Green ] "\nMeal saved successfully.\n")
+  | _ ->
+      print_string [ Foreground Red ]
+        "\nInvalid meal type. Please enter breakfast, lunch, or dinner.\n";
+      add_meal user

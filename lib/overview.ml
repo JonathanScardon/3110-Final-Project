@@ -136,8 +136,8 @@ and meal_input user =
       Unix.sleep 2;
       mealplan_interface user
   | "2" ->
-      ();
-      health_interface user
+      Health.add_meal user;
+      mealplan_interface user
   | "3" ->
       ();
       health_interface user

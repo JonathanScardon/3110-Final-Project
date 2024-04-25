@@ -9,3 +9,6 @@ val remove_entry : string -> unit
 val mealplan : string -> int -> unit
 (** Generates a meal plan of breakfast, lunch, and dinner for [n] days. 
     Requires: [n] > 0.  *)
+
+val add_meal : string -> unit
+(** Adds a meal to the user's breakfast, lunch, or dinner CSV. *)
