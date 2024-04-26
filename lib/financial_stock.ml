@@ -90,6 +90,7 @@ let remove_stock user_id symbol =
   save_user_stock_financials user_id filtered_stocks
 
 let modify_stock user_id index symbol shares purchase_price last_price =
+  let index = index - 1 in
   let stocks = load_user_stock_financials user_id in
   let new_stocks =
     List.mapi

@@ -303,6 +303,7 @@ and prompt_remove_stock user =
   remove_stock user symbol
 
 and prompt_modify_stock user =
+  let () = view_stock_spread user in
   let () = print_endline "Enter stock index to modify: " in
   let index = read_line () in
   let () = print_endline "Enter new stock symbol: " in
