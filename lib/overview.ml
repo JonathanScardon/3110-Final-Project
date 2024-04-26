@@ -259,7 +259,8 @@ and manage_stock_options user =
       "2. Remove a stock\n";
       "3. Modify a stock\n";
       "4. Update stock prices\n";
-      "5. Return to financial menu\n";
+      "5. View stocks\n";
+      "6. Return to financial menu\n";
     ];
   print_string [ Bold ] "Select an option: ";
   stock_input user
@@ -279,7 +280,10 @@ and stock_input user =
   | "4" ->
       update_stock_prices user;
       manage_stock_options user
-  | "5" -> financial_interface user
+  | "5" ->
+      view_stock_spread user;
+      manage_stock_options user
+  | "6" -> financial_interface user
   | _ ->
       print_endline "Invalid choice. Please try again.";
       manage_stock_options user
