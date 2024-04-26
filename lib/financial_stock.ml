@@ -108,11 +108,12 @@ let modify_stock user_id index symbol shares purchase_price last_price =
 
 let view_stock_spread user =
   let stocks = load_user_stock_financials user in
-  List.iter
-    (fun stock ->
+  List.iteri
+    (fun index stock ->
       Printf.printf
-        "Stock: %s, Shares: %s, Purchase Price: $%s, Current Price: $%s\n"
-        (List.nth stock 0) (List.nth stock 1) (List.nth stock 2)
+        "Index: %i, Stock: %s, Shares: %s, Purchase Price: $%s, Current Price: \
+         $%s\n"
+        (index + 1) (List.nth stock 0) (List.nth stock 1) (List.nth stock 2)
         (List.nth stock 3))
     stocks
 
