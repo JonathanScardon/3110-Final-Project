@@ -1,108 +1,116 @@
-let load_financials user_id =
-  let path = "data/" ^ user_id ^ "_financials.csv" in
-  Csv.load path
+open Data
+open ANSITerminal
 
-let save_financials user_id data =
-  let path = "data/" ^ user_id ^ "_financials.csv" in
+type wallet = { name : string; balance : float }
+type credit_card = { name : string; limit : float; balance : float }
+type transaction = { date : string; amount : float; description : string }
+
+let user_financial_file user = "data/" ^ user ^ "_financials.csv"
+
+let load_financial_data user =
+  let path = user_financial_file user in
+  if Sys.file_exists path then Csv.load path else [ [ "tb"; "0.0" ] ]
+
+let save_financial_data user data =
+  let path = user_financial_file user in
   Csv.save path data
 
-let modify_wallet user_id wallet_name amount =
-  let wallets = load_financials user_id in
-  let exists, others =
-    List.partition (fun row -> List.hd row = wallet_name) wallets
-  in
-  let new_wallets =
-    match exists with
-    | [] -> [ wallet_name; string_of_float amount ] :: wallets
-    | [ existing ] ->
-        [
-          wallet_name;
-          string_of_float (float_of_string (List.nth existing 1) +. amount);
-        ]
-        :: others
-    | _ -> wallets
-  in
-  save_financials user_id new_wallets
+(* wallets *)
 
-type balance_operation = Add | Subtract | Set
+let add_wallet user name initial_balance =
+  let data = load_financial_data user in
+  let new_data = [ "wallet"; name; string_of_float initial_balance ] :: data in
+  save_financial_data user new_data
 
-let adjust_wallet_balance user_id wallet_name operation amount =
-  let wallets = load_financials user_id in
-  let exists, others =
-    List.partition (fun row -> List.hd row = wallet_name) wallets
-  in
-  let new_wallets =
-    match exists with
-    | [ existing ] ->
-        let current_balance = float_of_string (List.nth existing 1) in
-        let new_balance =
-          match operation with
-          | Add -> current_balance +. amount
-          | Subtract -> current_balance -. amount
-          | Set -> amount
-        in
-        [ wallet_name; string_of_float new_balance ] :: others
-    | [] ->
-        if operation = Set then
-          [ wallet_name; string_of_float amount ] :: wallets
-        else failwith "Wallet does not exist, cannot add or subtract."
-    | _ -> wallets
-  in
-  save_financials user_id new_wallets
-
-let view_wallet_spread user_id =
-  let wallets = load_financials user_id in
-  let total =
-    List.fold_left
-      (fun acc row ->
-        match row with _ :: amt :: _ -> acc +. float_of_string amt | _ -> acc)
-      0.0 wallets
-  in
-
-  List.iter
-    (fun row ->
-      match row with
-      | _ :: amt :: _ ->
-          let name = List.hd row in
-          let balance = float_of_string amt in
-          Printf.printf "%s holds $%.2f, which is %.2f%% of total funds.\n" name
-            balance
-            (100. *. balance /. total)
-      | _ -> ())
-    wallets
-
-let add_wallet user_id wallet_name initial_balance =
-  let wallets = load_financials user_id in
-  if List.exists (fun row -> List.hd row = wallet_name) wallets then
-    print_endline "Wallet already exists.\n"
-  else
-    let new_wallets =
-      [ wallet_name; string_of_float initial_balance ] :: wallets
+let edit_wallet_balance user name operation amount =
+  let data = load_financial_data user in
+  try
+    let modified_data =
+      List.map
+        (fun row ->
+          if List.nth row 1 = name then
+            match operation with
+            | "add" ->
+                [
+                  "wallet";
+                  name;
+                  string_of_float (float_of_string (List.nth row 2) +. amount);
+                ]
+            | "subtract" ->
+                [
+                  "wallet";
+                  name;
+                  string_of_float (float_of_string (List.nth row 2) -. amount);
+                ]
+            | "set" -> [ "wallet"; name; string_of_float amount ]
+            | _ -> row
+          else row)
+        data
     in
-    save_financials user_id new_wallets;
-    print_endline "Wallet added successfully.\n"
+    save_financial_data user modified_data
+  with _ ->
+    print_string [ Foreground Red ]
+      "\nYou do not have a wallet yet. Please add one to edit it.\n"
 
-let remove_wallet user_id wallet_name =
-  let wallets = load_financials user_id in
-  let exists, others =
-    List.partition (fun row -> List.hd row = wallet_name) wallets
+(* credit cards *)
+let add_credit_card user name limit =
+  let data = load_financial_data user in
+  let new_data =
+    [ "credit_card"; name; string_of_float limit; "0.0" ] :: data
   in
-  match exists with
-  | [] -> print_endline "Wallet does not exist.\n"
-  | _ ->
-      save_financials user_id others;
-      print_endline "Wallet removed successfully.\n"
+  save_financial_data user new_data
 
-let log_transaction user_id wallet_name operation amount =
-  let path = "data/" ^ user_id ^ "_transactions.csv" in
-  let transactions = Csv.load path in
-  let new_entry =
-    [
-      wallet_name;
-      operation;
-      string_of_float amount;
-      string_of_float (Unix.time ());
-    ]
+let charge_credit_card user name amount =
+  let data = load_financial_data user in
+  try
+    let modified_data =
+      List.map
+        (fun row ->
+          if List.nth row 1 = name then
+            [
+              "credit_card";
+              name;
+              List.nth row 2
+              ^ string_of_float (float_of_string (List.nth row 3) +. amount);
+            ]
+          else row)
+        data
+    in
+    save_financial_data user modified_data
+  with _ ->
+    print_string [ Foreground Red ] "\nYou do not have a credit card yet.\n"
+
+(* Cross functionality *)
+
+let pay_credit_card_balance user credit_name wallet_name amount =
+  print_endline ""
+(* check if wallet balance < amount *)
+(* subtract amount from both credit and wallet *)
+
+(* transactions *)
+
+let log_transaction user date amount description =
+  let data = load_financial_data user in
+  let new_data =
+    [ "transaction"; date; string_of_float amount; description ] :: data
   in
-  Csv.save path (new_entry :: transactions);
-  print_endline "Transaction logged successfully.\n"
+  save_financial_data user new_data
+
+let calculate_total_balance user =
+  let data = load_financial_data user in
+  List.fold_left
+    (fun acc row ->
+      if List.nth row 0 = "wallet" then acc +. float_of_string (List.nth row 2)
+      else acc)
+    0.0 data
+
+let save_total_balance user =
+  let data = load_financial_data user in
+  let total = calculate_total_balance user in
+  let updated_data =
+    List.map
+      (fun row ->
+        if List.nth row 0 = "TB" then [ "TB"; string_of_float total ] else row)
+      data
+  in
+  save_financial_data user updated_data
