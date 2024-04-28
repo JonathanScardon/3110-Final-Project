@@ -30,7 +30,7 @@ let rec mood_interface user =
     print_string [ Bold ] "Please choose an option (1-6): ";
     after_mood_input user rand_quote)
   else (
-    print_string [ Bold ] "How are you feeling today? ";
+    print_string [ Reset ] "How are you feeling today? ";
     process_mood user)
 
 and process_mood user =
@@ -304,15 +304,15 @@ and prompt_remove_stock user =
 
 and prompt_modify_stock user =
   let () = view_stock_spread user in
-  let () = print_endline "Enter stock index to modify: " in
+  let () = print_string [ Reset ] "Enter stock index to modify: " in
   let index = read_line () in
-  let () = print_endline "Enter new stock symbol: " in
+  let () = print_string [ Reset ] "Enter new stock symbol: " in
   let symbol = read_line () in
-  let () = print_endline "Enter new number of shares: " in
+  let () = print_string [ Reset ] "Enter new number of shares: " in
   let shares = read_line () in
-  let () = print_endline "Enter new purchase price: " in
+  let () = print_string [ Reset ] "Enter new purchase price: " in
   let price = read_line () in
-  let () = print_endline "Enter last known price: " in
+  let () = print_string [ Reset ] "Enter last known price: " in
   let last_price = read_line () in
   modify_stock user (int_of_string index) symbol (int_of_string shares)
     (float_of_string price)

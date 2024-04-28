@@ -57,7 +57,8 @@ let rec edit_data lst id data =
       match h with
       | [] -> h :: edit_data t id data
       | a :: b ->
-          if a = id then ([ id; data ] @ b) :: t else h :: edit_data t id data)
+          if a = id then ([ id ^ "\n" ] @ b @ [ data ]) :: t
+          else h :: edit_data t id data)
 
 let edit id path data =
   let lst = Csv.load path in
@@ -93,7 +94,7 @@ let rec search_entry header path =
       print_string [ Foreground Red ] "Sorry, this entry does not exist!\n";
       search_entry header path
 
-let see_history header path =
+let rec see_history header path =
   print_string [ Reset ]
     "\n\
      Enter 'back' to go back to the menu. \n\
@@ -110,7 +111,10 @@ let see_history header path =
       let limit = int_of_string message2 in
       print_endline (header ^ get_data path (Some limit))
     with _ -> print_endline (header ^ get_data path None)
-  else print_endline (header ^ get_data path None)
+  else if message = "n" then print_endline (header ^ get_data path None)
+  else (
+    print_string [ Foreground Red ] "\nPlease enter y or n\n";
+    see_history header path)
 
 let rec remove_entry path =
   print_string [ Reset ]
