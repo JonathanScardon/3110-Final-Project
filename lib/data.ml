@@ -52,13 +52,12 @@ let rec remove_data_list lst data =
 
 let rec edit_data lst id data =
   match lst with
-  | [] -> [ [ id; data ] ]
+  | [] -> [ [ id; "\n"; data ] ]
   | h :: t -> (
       match h with
       | [] -> h :: edit_data t id data
-      | a :: b ->
-          if a = id then ([ id ^ "\n" ] @ b @ [ data ]) :: t
-          else h :: edit_data t id data)
+      | a :: _ as c ->
+          if a = id then (c @ [ data ]) :: t else h :: edit_data t id data)
 
 let edit id path data =
   let lst = Csv.load path in
