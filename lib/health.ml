@@ -29,11 +29,12 @@ let add_health_data user journal =
   if input1 = "back" then ()
   else
     let () = print_string [ Reset ] ("\n" ^ msg2) in
-    let input2 =
-      if journal = "exercise" then read_line () ^ " hr" else read_line ()
-    in
+    let input2 = read_line () in
     if input2 = "back" then ()
     else
+      let input2 =
+        if journal = "exercise" then read_line () ^ " hr" else read_line ()
+      in
       let data = input1 ^ "; " ^ input2 ^ "; " ^ time_of_day ^ "\n" in
       print_string [ Foreground Green ] "\nEntry added successfully!\n";
       edit curr_date path data
