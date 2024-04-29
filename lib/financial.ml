@@ -123,12 +123,33 @@ let pay_credit_card_balance user credit_name wallet_name amount =
 
 (* transactions *)
 
-let log_transaction user date amount description =
-  let data = load_financial_data user in
-  let new_data =
-    [ "transaction"; date; string_of_float amount; description ] :: data
+let user_transaction_log_file user = "data/" ^ user ^ "_transaction_log.csv"
+
+let log_transaction user t_type date amount description entity =
+  let path = user_transaction_log_file user in
+  let data = Csv.load path in
+  let new_entry =
+    [ t_type; date; string_of_float amount; description; entity ]
   in
-  save_financial_data user new_data
+  let updated_data = new_entry :: data in
+  Csv.save path updated_data
+
+let load_transaction_log user =
+  let path = user_transaction_log_file user in
+  if Sys.file_exists path then Csv.load path else []
+
+let view_transaction_history user limit =
+  let transactions = load_transaction_log user in
+  let limited_transactions =
+    match limit with Some l -> take l transactions | None -> transactions
+  in
+  List.iter
+    (fun row ->
+      Printf.printf "%s, %s, %s, %s, %s\n" (List.nth row 0) (List.nth row 1)
+        (List.nth row 2) (List.nth row 3) (List.nth row 4))
+    limited_transactions
+
+(* total balance *)
 
 let calculate_total_balance user =
   let data = load_financial_data user in
