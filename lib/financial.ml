@@ -83,9 +83,43 @@ let charge_credit_card user name amount =
 (* Cross functionality *)
 
 let pay_credit_card_balance user credit_name wallet_name amount =
-  print_endline ""
-(* check if wallet balance < amount *)
-(* subtract amount from both credit and wallet *)
+  let data = load_financial_data user in
+  let credit_card, others =
+    List.partition
+      (fun row ->
+        List.nth row 1 = credit_name && List.nth row 0 = "credit_card")
+      data
+  in
+  let wallet, others =
+    List.partition
+      (fun row -> List.nth row 1 = wallet_name && List.nth row 0 = "wallet")
+      others
+  in
+  match (credit_card, wallet) with
+  | ( [ [ "credit_card"; _; limit; balance ] ],
+      [ [ "wallet"; _; wallet_balance ] ] ) ->
+      let balance = float_of_string balance in
+      let wallet_balance = float_of_string wallet_balance in
+      let pay_amount = min balance (min amount wallet_balance) in
+      if pay_amount > 0.0 then (
+        let new_credit_balance = balance -. pay_amount in
+        let new_wallet_balance = wallet_balance -. pay_amount in
+        let new_data =
+          [
+            "credit_card";
+            credit_name;
+            limit;
+            string_of_float new_credit_balance;
+          ]
+          :: [ "wallet"; wallet_name; string_of_float new_wallet_balance ]
+          :: others
+        in
+        save_financial_data user new_data;
+        print_string [ Foreground Green ] "\nPayment successful.\n")
+      else
+        print_string [ Foreground Red ]
+          "\nInvalid payment amount or insufficient funds.\n"
+  | _ -> print_string [ Foreground Red ] "\nCredit card or wallet not found.\n"
 
 (* transactions *)
 
@@ -105,8 +139,8 @@ let calculate_total_balance user =
     0.0 data
 
 let save_total_balance user =
-  let data = load_financial_data user in
   let total = calculate_total_balance user in
+  let data = load_financial_data user in
   let updated_data =
     List.map
       (fun row ->
