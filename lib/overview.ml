@@ -199,8 +199,8 @@ and financial_interface user =
     [
       "1. View personal stock spread\n";
       "2. View all bank accounts\n";
-      "3. Add bank to overall wallet\n";
-      "4. Edit funds in bank wallet\n";
+      "3. Add new account to bank\n";
+      "4. Edit funds in bank accounts\n";
       "5. Return to main menu\n";
     ];
   print_string [ Bold ] "Please enter a command: ";
@@ -216,31 +216,24 @@ and financial_input user =
       (* view_all_banks user; *)
       financial_interface user
   | "3" ->
-      prompt_add_wallet user;
+      Financial.prompt_add_account user;
       financial_interface user
   | "4" ->
-      prompt_edit_wallet user;
+      prompt_edit_account user;
       financial_interface user
   | "5" -> dashboard_login user
   | _ ->
       print_endline "Invalid option. Please try again.";
       financial_interface user
 
-and prompt_add_wallet user =
-  print_string [ Reset ] "Enter wallet name: ";
-  let wallet_name = read_line () in
-  let () = print_string [ Reset ] "Enter initial balance: " in
-  let balance = read_line () in
-  Financial.add_wallet user wallet_name (float_of_string balance)
-
-and prompt_edit_wallet user =
-  let () = print_string [ Reset ] "Enter wallet name to edit: " in
-  let wallet_name = read_line () in
+and prompt_edit_account user =
+  let () = print_string [ Reset ] "Enter account name to edit: " in
+  let account_name = read_line () in
   let () = print_string [ Reset ] "Select operation (add/subtract/set): " in
   let op = read_line () in
   let () = print_string [ Reset ] "Enter amount: " in
   let amount = read_line () in
-  Financial.edit_wallet_balance user wallet_name op (float_of_string amount)
+  Financial.edit_account_balance user account_name op (float_of_string amount)
 
 and manage_stock_options user =
   print_string [ Reset; Bold; Foreground Blue ] "\nStock Management\n";

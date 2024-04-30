@@ -1,9 +1,9 @@
 open Data
 open ANSITerminal
 
-type wallet = { name : string; balance : float }
-type credit_card = { name : string; limit : float; balance : float }
-type transaction = { date : string; amount : float; description : string }
+(* type account = { name : string; balance : float }
+   type credit_card = { name : string; limit : float; balance : float }
+   type transaction = { date : string; amount : float; description : string } *)
 
 let user_financial_file user = "data/" ^ user ^ "_financials.csv"
 
@@ -15,14 +15,25 @@ let save_financial_data user data =
   let path = user_financial_file user in
   Csv.save path data
 
-(* wallets *)
+(* accounts *)
 
-let add_wallet user name initial_balance =
+let add_account user name balance =
   let data = load_financial_data user in
-  let new_data = [ "wallet"; name; string_of_float initial_balance ] :: data in
+  let new_data = [ "account"; name; string_of_float balance ] :: data in
   save_financial_data user new_data
 
-let edit_wallet_balance user name operation amount =
+let rec prompt_add_account user =
+  print_string [ Reset ] "Enter account name: ";
+  let account_name = read_line () in
+  let () = print_string [ Reset ] "Enter initial balance: " in
+  try
+    let balance = float_of_string (read_line ()) in
+    add_account user account_name balance
+  with _ ->
+    print_string [ Foreground Red ] "\nPlease enter a number!\n";
+    prompt_add_account user
+
+let edit_account_balance user name operation amount =
   let data = load_financial_data user in
   try
     let modified_data =
@@ -32,17 +43,17 @@ let edit_wallet_balance user name operation amount =
             match operation with
             | "add" ->
                 [
-                  "wallet";
+                  "account";
                   name;
                   string_of_float (float_of_string (List.nth row 2) +. amount);
                 ]
             | "subtract" ->
                 [
-                  "wallet";
+                  "account";
                   name;
                   string_of_float (float_of_string (List.nth row 2) -. amount);
                 ]
-            | "set" -> [ "wallet"; name; string_of_float amount ]
+            | "set" -> [ "account"; name; string_of_float amount ]
             | _ -> row
           else row)
         data
@@ -50,7 +61,7 @@ let edit_wallet_balance user name operation amount =
     save_financial_data user modified_data
   with _ ->
     print_string [ Foreground Red ]
-      "\nYou do not have a wallet yet. Please add one to edit it.\n"
+      "\nYou do not have a account yet. Please add one to edit it.\n"
 
 (* credit cards *)
 let add_credit_card user name limit =
@@ -82,7 +93,7 @@ let charge_credit_card user name amount =
 
 (* Cross functionality *)
 
-let pay_credit_card_balance user credit_name wallet_name amount =
+let pay_credit_card_balance user credit_name account_name amount =
   let data = load_financial_data user in
   let credit_card, others =
     List.partition
@@ -90,20 +101,20 @@ let pay_credit_card_balance user credit_name wallet_name amount =
         List.nth row 1 = credit_name && List.nth row 0 = "credit_card")
       data
   in
-  let wallet, others =
+  let account, others =
     List.partition
-      (fun row -> List.nth row 1 = wallet_name && List.nth row 0 = "wallet")
+      (fun row -> List.nth row 1 = account_name && List.nth row 0 = "account")
       others
   in
-  match (credit_card, wallet) with
+  match (credit_card, account) with
   | ( [ [ "credit_card"; _; limit; balance ] ],
-      [ [ "wallet"; _; wallet_balance ] ] ) ->
+      [ [ "account"; _; account_balance ] ] ) ->
       let balance = float_of_string balance in
-      let wallet_balance = float_of_string wallet_balance in
-      let pay_amount = min balance (min amount wallet_balance) in
+      let account_balance = float_of_string account_balance in
+      let pay_amount = min balance (min amount account_balance) in
       if pay_amount > 0.0 then (
         let new_credit_balance = balance -. pay_amount in
-        let new_wallet_balance = wallet_balance -. pay_amount in
+        let new_account_balance = account_balance -. pay_amount in
         let new_data =
           [
             "credit_card";
@@ -111,7 +122,7 @@ let pay_credit_card_balance user credit_name wallet_name amount =
             limit;
             string_of_float new_credit_balance;
           ]
-          :: [ "wallet"; wallet_name; string_of_float new_wallet_balance ]
+          :: [ "account"; account_name; string_of_float new_account_balance ]
           :: others
         in
         save_financial_data user new_data;
@@ -119,7 +130,7 @@ let pay_credit_card_balance user credit_name wallet_name amount =
       else
         print_string [ Foreground Red ]
           "\nInvalid payment amount or insufficient funds.\n"
-  | _ -> print_string [ Foreground Red ] "\nCredit card or wallet not found.\n"
+  | _ -> print_string [ Foreground Red ] "\nCredit card or account not found.\n"
 
 (* transactions *)
 
@@ -155,7 +166,7 @@ let calculate_total_balance user =
   let data = load_financial_data user in
   List.fold_left
     (fun acc row ->
-      if List.nth row 0 = "wallet" then acc +. float_of_string (List.nth row 2)
+      if List.nth row 0 = "account" then acc +. float_of_string (List.nth row 2)
       else acc)
     0.0 data
 
