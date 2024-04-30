@@ -219,21 +219,12 @@ and financial_input user =
       Financial.prompt_add_account user;
       financial_interface user
   | "4" ->
-      prompt_edit_account user;
+      Financial.prompt_edit_account user;
       financial_interface user
   | "5" -> dashboard_login user
   | _ ->
       print_endline "Invalid option. Please try again.";
       financial_interface user
-
-and prompt_edit_account user =
-  let () = print_string [ Reset ] "Enter account name to edit: " in
-  let account_name = read_line () in
-  let () = print_string [ Reset ] "Select operation (add/subtract/set): " in
-  let op = read_line () in
-  let () = print_string [ Reset ] "Enter amount: " in
-  let amount = read_line () in
-  Financial.edit_account_balance user account_name op (float_of_string amount)
 
 and manage_stock_options user =
   print_string [ Reset; Bold; Foreground Blue ] "\nStock Management\n";

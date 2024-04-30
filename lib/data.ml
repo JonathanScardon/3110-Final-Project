@@ -69,7 +69,13 @@ let remove_data path data =
 
 let search id path =
   let sheet = Csv.load path in
-  List.exists (fun row -> List.nth row 0 = id) sheet
+  try List.exists (fun row -> List.nth row 0 = id) sheet
+  with Failure _ -> false
+
+let search2 id path =
+  let sheet = Csv.load path in
+  try List.exists (fun row -> List.nth row 1 = id) sheet
+  with Failure _ -> false
 
 let find_entry id path =
   let sheet = Csv.load path in

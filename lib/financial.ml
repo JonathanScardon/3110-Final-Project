@@ -20,12 +20,13 @@ let save_financial_data user data =
 let add_account user name balance =
   let data = load_financial_data user in
   let new_data = [ "account"; name; string_of_float balance ] :: data in
+  print_string [ Background Green ] "\nNew account saved successfully!\n";
   save_financial_data user new_data
 
 let rec prompt_add_account user =
-  print_string [ Reset ] "Enter account name: ";
+  print_string [ Reset ] "\nEnter account name: ";
   let account_name = read_line () in
-  let () = print_string [ Reset ] "Enter initial balance: " in
+  let () = print_string [ Reset ] "Enter initial balance: $" in
   try
     let balance = float_of_string (read_line ()) in
     add_account user account_name balance
@@ -62,6 +63,27 @@ let edit_account_balance user name operation amount =
   with _ ->
     print_string [ Foreground Red ]
       "\nYou do not have a account yet. Please add one to edit it.\n"
+
+let rec prompt_edit_account user =
+  let () = print_string [ Reset ] "\nEnter account name to edit: " in
+  let account_name = read_line () in
+  if not (Data.search2 account_name (user_financial_file user)) then (
+    print_string [ Foreground Red ] "\nThis account does not exist.\n";
+    prompt_edit_account user)
+  else
+    let () = print_string [ Reset ] "Select operation (add/subtract/set): " in
+    let op = read_line () in
+    if op <> "add" && op <> "subtract" && op <> "set" then (
+      print_string [ Foreground Red ] "\nPlease input add, subtract, or set.\n";
+      prompt_edit_account user)
+    else
+      try
+        let () = print_string [ Reset ] "Enter amount: " in
+        let amount = read_line () in
+        edit_account_balance user account_name op (float_of_string amount)
+      with _ ->
+        print_string [ Foreground Red ] "\nPlease enter a numerical amount!\n";
+        prompt_edit_account user
 
 (* credit cards *)
 let add_credit_card user name limit =

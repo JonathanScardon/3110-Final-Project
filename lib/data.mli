@@ -13,6 +13,10 @@ val search : string -> string -> bool
 (** [search id path] returns if the row with [id] as a first element is 
     contained within the CSV [path]. *)
 
+val search2 : string -> string -> bool
+(** [search2 id path] returns if the row with [id] as a second element is 
+    contained within the CSV [path]. *)
+
 val find_entry : string -> string -> string
 (** [find_entry id path] returns the first entry with [id] as a first element, 
     contained within the CSV [path]. *)

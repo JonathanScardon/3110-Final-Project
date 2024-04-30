@@ -1,4 +1,5 @@
 val prompt_add_account : string -> unit
+val prompt_edit_account : string -> unit
 
 val add_account : string -> string -> float -> unit
 (** [add_account user name balance] adds the account [name] with 
