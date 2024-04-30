@@ -17,6 +17,21 @@ let save_financial_data user data =
 
 (* accounts *)
 
+let view_bank_accounts user =
+  let sheet = Csv.load (user_financial_file user) in
+  print_endline "\nAccount | Balance";
+  print_endline
+    (List.fold_right
+       (fun lst acc ->
+         match lst with
+         | [] -> ""
+         | h :: t when h = "account" ->
+             if acc <> "" then String.concat " " t ^ "\n" ^ acc
+             else String.concat " " t
+         | _ :: _ -> "")
+       sheet ""
+    ^ "\n")
+
 let add_account user name balance =
   let data = load_financial_data user in
   let new_data = [ "account"; name; string_of_float balance ] :: data in

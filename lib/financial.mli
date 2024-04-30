@@ -6,3 +6,4 @@ val add_account : string -> string -> float -> unit
     balance [balance] to the user's bank. *)
 
 val edit_account_balance : string -> string -> string -> unit
+val view_bank_accounts : string -> unit

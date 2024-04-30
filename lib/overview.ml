@@ -213,7 +213,8 @@ and financial_input user =
       manage_stock_options user;
       financial_interface user
   | "2" ->
-      (* view_all_banks user; *)
+      Financial.view_bank_accounts user;
+      Unix.sleep 2;
       financial_interface user
   | "3" ->
       Financial.prompt_add_account user;
