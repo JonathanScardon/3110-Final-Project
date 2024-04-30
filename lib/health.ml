@@ -14,7 +14,7 @@ let min =
 
 let time_of_day = hour ^ ":" ^ min
 
-let add_health_data user journal =
+let rec add_health_data user journal =
   let msg1 =
     if journal = "food" then "What type of meal did you eat? "
     else "Which type of exercise did you do? "
@@ -31,8 +31,18 @@ let add_health_data user journal =
     let () = print_string [ Reset ] ("\n" ^ msg2) in
     let input2 = read_line () in
     if input2 = "back" then ()
+    else if journal = "exercise" then (
+      match float_of_string_opt input2 with
+      | None ->
+          print_string [ Foreground Red ]
+            "\nPlease enter the number of hours exercised.\n";
+          add_health_data user journal
+      | Some _ ->
+          let input2 = input2 ^ " hr" in
+          let data = input1 ^ "; " ^ input2 ^ "; " ^ time_of_day ^ "\n" in
+          print_string [ Foreground Green ] "\nEntry added successfully!\n";
+          edit curr_date path data)
     else
-      let input2 = if journal = "exercise" then input2 ^ " hr" else input2 in
       let data = input1 ^ "; " ^ input2 ^ "; " ^ time_of_day ^ "\n" in
       print_string [ Foreground Green ] "\nEntry added successfully!\n";
       edit curr_date path data
