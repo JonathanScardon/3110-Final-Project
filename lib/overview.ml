@@ -201,9 +201,10 @@ and financial_interface user =
       "2. View all bank accounts\n";
       "3. Add new account to bank\n";
       "4. Edit funds in bank accounts\n";
-      "5. Return to main menu\n";
+      "5. Add new credit card\n";
+      "6. Return to main menu\n";
     ];
-  print_string [ Bold ] "Please choose an option (1-5): ";
+  print_string [ Bold ] "Please choose an option (1-6): ";
   financial_input user
 
 and financial_input user =
@@ -222,7 +223,10 @@ and financial_input user =
   | "4" ->
       Financial.prompt_edit_account user;
       financial_interface user
-  | "5" -> dashboard_login user
+  | "5" ->
+      Financial.add_credit_card user;
+      financial_interface user
+  | "6" -> dashboard_login user
   | _ ->
       print_endline "Invalid option. Please try again.";
       financial_interface user

@@ -35,8 +35,8 @@ let view_bank_accounts user =
 let add_account user name balance =
   let data = load_financial_data user in
   let new_data = [ "account"; name; string_of_float balance ] :: data in
-  print_string [ Foreground Green ] "\nNew account saved successfully!\n";
-  save_financial_data user new_data
+  save_financial_data user new_data;
+  print_string [ Foreground Green ] "\nNew account saved successfully!\n"
 
 let rec prompt_add_account user =
   print_string [ Reset ] "\nEnter account name: ";
@@ -77,9 +77,9 @@ let rec edit_account_balance user name operation =
   | Some amount ->
       let data = load_financial_data user in
       let modified_data = modify_account name operation amount data in
+      save_financial_data user modified_data;
       print_string [ Foreground Green ]
-        "\nAccount balance modified successfully!\n";
-      save_financial_data user modified_data
+        "\nAccount balance modified successfully.\n"
 
 let rec prompt_edit_account user =
   let () = print_string [ Reset ] "\nEnter account name to edit: " in
@@ -96,12 +96,22 @@ let rec prompt_edit_account user =
     else edit_account_balance user account_name op
 
 (* credit cards *)
-let add_credit_card user name limit =
-  let data = load_financial_data user in
-  let new_data =
-    [ "credit_card"; name; string_of_float limit; "0.0" ] :: data
-  in
-  save_financial_data user new_data
+let rec add_credit_card user =
+  print_string [ Reset ] "\nEnter credit card name: ";
+  let name = read_line () in
+  let () = print_string [ Reset ] "Enter credit limit: " in
+  let limit = float_of_string_opt (read_line ()) in
+  match limit with
+  | None ->
+      print_string [ Foreground Red ] "\nPlease enter a numerical limit!\n";
+      add_credit_card user
+  | Some limit ->
+      let data = load_financial_data user in
+      let new_data =
+        [ "credit_card"; name; string_of_float limit; "0.0" ] :: data
+      in
+      save_financial_data user new_data;
+      print_string [ Foreground Green ] "\nCredit card added successfully.\n"
 
 let charge_credit_card user name amount =
   let data = load_financial_data user in
