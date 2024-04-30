@@ -39,12 +39,11 @@ val see_history : string -> string -> unit
     to limit the number of entries displayed and, if so, to how many.
     If 'back' is entered, the operation is canceled. *)
 
-val remove_entry : string -> string -> unit
-(** [remove_entry path date] removes an entry corresponding to [date] in the 
+val remove_entry : string -> unit
+(** [remove_entry path] removes an entry corresponding to a date in the 
     format day-month-year (e.g., 2-3-2024) from the CSV at the given [path]. 
     If the date is not found, it informs the user. If 'back' is entered, the 
     operation is canceled. *)
 
-val data_to_list : string -> string list list
-(** [data_to_list path] converts all CSV data from [path] into a list of lists, 
-    where each inner list represents a row in the CSV. *)
+val data_to_list : string -> string list
+(** [data_to_list path] converts all CSV data from [path] into a list. *)
