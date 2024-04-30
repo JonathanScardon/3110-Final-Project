@@ -170,7 +170,7 @@ and process_choice user =
   match choice with
   | "1" -> mood_interface user
   | "2" -> health_interface user
-  (* | "3" -> financial_interface user *)
+  | "3" -> financial_interface user
   | "4" -> ()
   | "5" ->
       print_endline "Exiting...";
@@ -193,117 +193,108 @@ and dashboard_login user =
 
 (* financial interface *)
 
-(* and financial_interface user =
-     print_string [ Reset; Bold; Foreground Green ] "\nFinancial Tracker\n";
-     print_strings [ Reset ]
-       [
-         "1. View personal stock spread\n";
-         "2. View all bank accounts\n";
-         "3. Add bank to overall wallet\n";
-         "4. Edit funds in bank wallet\n";
-         "5. Return to main menu\n";
-       ];
-     print_string [ Bold ] "Please enter a command: ";
-     financial_input user
+and financial_interface user =
+  print_string [ Reset; Bold; Foreground Green ] "\nFinancial Tracker\n";
+  print_strings [ Reset ]
+    [
+      "1. View personal stock spread\n";
+      "2. View all bank accounts\n";
+      "3. Add bank to overall wallet\n";
+      "4. Edit funds in bank wallet\n";
+      "5. Return to main menu\n";
+    ];
+  print_string [ Bold ] "Please enter a command: ";
+  financial_input user
 
-   and financial_input user =
-     let choice = read_line () in
-     match choice with
-     | "1" ->
-         manage_stock_options user;
-         financial_interface user
-     | "2" ->
-         view_all_banks user;
-         financial_interface user
-     | "3" ->
-         prompt_add_wallet user;
-         financial_interface user
-     | "4" ->
-         prompt_edit_wallet user;
-         financial_interface user
-     | "5" -> dashboard_login user
-     | _ ->
-         print_endline "Invalid option. Please try again.";
-         financial_interface user
+and financial_input user =
+  let choice = read_line () in
+  match choice with
+  | "1" ->
+      manage_stock_options user;
+      financial_interface user
+  | "2" ->
+      (* view_all_banks user; *)
+      financial_interface user
+  | "3" ->
+      prompt_add_wallet user;
+      financial_interface user
+  | "4" ->
+      prompt_edit_wallet user;
+      financial_interface user
+  | "5" -> dashboard_login user
+  | _ ->
+      print_endline "Invalid option. Please try again.";
+      financial_interface user
 
-   and view_all_banks user = view_wallet_spread user
+and prompt_add_wallet user =
+  print_string [ Reset ] "Enter wallet name: ";
+  let wallet_name = read_line () in
+  let () = print_string [ Reset ] "Enter initial balance: " in
+  let balance = read_line () in
+  Financial.add_wallet user wallet_name (float_of_string balance)
 
-   and prompt_add_wallet user =
-     print_endline "Enter wallet name: ";
-     let wallet_name = read_line () in
-     let () = print_endline "Enter initial balance: " in
-     let balance = read_line () in
-     add_wallet user wallet_name (float_of_string balance)
+and prompt_edit_wallet user =
+  let () = print_string [ Reset ] "Enter wallet name to edit: " in
+  let wallet_name = read_line () in
+  let () = print_string [ Reset ] "Select operation (add/subtract/set): " in
+  let op = read_line () in
+  let () = print_string [ Reset ] "Enter amount: " in
+  let amount = read_line () in
+  Financial.edit_wallet_balance user wallet_name op (float_of_string amount)
 
-   and prompt_edit_wallet user =
-     let () = print_endline "Enter wallet name to edit: " in
-     let wallet_name = read_line () in
-     let () = print_endline "Select operation (add/subtract/set): " in
-     let operation = read_line () in
-     let () = print_endline "Enter amount: " in
-     let amount = read_line () in
-     let op =
-       match operation with
-       | "add" -> Add
-       | "subtract" -> Subtract
-       | "set" -> Set
-       | _ -> failwith "Invalid operation"
-     in
-     adjust_wallet_balance user wallet_name op (float_of_string amount)
+and manage_stock_options user =
+  print_string [ Reset; Bold; Foreground Blue ] "\nStock Management\n";
+  print_strings [ Reset ]
+    [
+      "1. Add a new stock\n";
+      "2. Remove a stock\n";
+      "3. Modify a stock\n";
+      "4. Update stock prices\n";
+      "5. View stocks\n";
+      "6. Return to financial menu\n";
+    ];
+  print_string [ Bold ] "Select an option: ";
+  stock_input user
 
-   and manage_stock_options user =
-     print_string [ Reset; Bold; Foreground Blue ] "\nStock Management\n";
-     print_strings [ Reset ]
-       [
-         "1. Add a new stock\n";
-         "2. Remove a stock\n";
-         "3. Modify a stock\n";
-         "4. Update stock prices\n";
-         "5. View stocks\n";
-         "6. Return to financial menu\n";
-       ];
-     print_string [ Bold ] "Select an option: ";
-     stock_input user
+and stock_input user =
+  let choice = read_line () in
+  match choice with
+  | "1" ->
+      (* prompt_add_stock user; *)
+      manage_stock_options user
+  | "2" ->
+      (* prompt_remove_stock user; *)
+      manage_stock_options user
+  | "3" ->
+      (* prompt_modify_stock user; *)
+      manage_stock_options user
+  | "4" ->
+      (* Financial.update_stock_prices user; *)
+      manage_stock_options user
+  | "5" ->
+      (* Financial.view_stock_spread user; *)
+      manage_stock_options user
+  | "6" -> financial_interface user
+  | _ ->
+      print_endline "Invalid option. Please try again.";
+      manage_stock_options user
 
-   and stock_input user =
-     let choice = read_line () in
-     match choice with
-     | "1" ->
-         prompt_add_stock user;
-         manage_stock_options user
-     | "2" ->
-         prompt_remove_stock user;
-         manage_stock_options user
-     | "3" ->
-         prompt_modify_stock user;
-         manage_stock_options user
-     | "4" ->
-         update_stock_prices user;
-         manage_stock_options user
-     | "5" ->
-         view_stock_spread user;
-         manage_stock_options user
-     | "6" -> financial_interface user
-     | _ ->
-         print_endline "Invalid choice. Please try again.";
-         manage_stock_options user
-
-   and prompt_add_stock user =
-     let () = print_endline "Enter stock symbol: " in
+(* and prompt_add_stock user =
+     let () = print_string [ Reset ] "Enter stock symbol: " in
      let symbol = read_line () in
-     let () = print_endline "Enter number of shares: " in
+     let () = print_string [ Reset ] "Enter number of shares: " in
      let shares = read_line () in
-     let () = print_endline "Enter purchase price: " in
+     let () = print_string [ Reset ] "Enter purchase price: " in
      let price = read_line () in
-     add_stock user symbol (int_of_string shares) (float_of_string price)
+     Financial.add_stock user symbol (int_of_string shares) (float_of_string price)
 
    and prompt_remove_stock user =
-     let () = print_endline "Enter stock symbol to remove: " in
+     let () = print_string [ Reset ] "Enter stock symbol to remove: " in
      let symbol = read_line () in
-     remove_stock user symbol
+     Financial.remove_stock user symbol
 
    and prompt_modify_stock user =
-     let () = view_stock_spread user in
+     let () = Financial.view_stock_spread user in
      let () = print_string [ Reset ] "Enter stock index to modify: " in
      let index = read_line () in
      let () = print_string [ Reset ] "Enter new stock symbol: " in
@@ -314,6 +305,6 @@ and dashboard_login user =
      let price = read_line () in
      let () = print_string [ Reset ] "Enter last known price: " in
      let last_price = read_line () in
-     modify_stock user (int_of_string index) symbol (int_of_string shares)
-       (float_of_string price)
+     Financial.modify_stock user (int_of_string index) symbol
+       (int_of_string shares) (float_of_string price)
        (float_of_string last_price) *)
