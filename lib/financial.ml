@@ -20,13 +20,13 @@ let save_financial_data user data =
 let add_account user name balance =
   let data = load_financial_data user in
   let new_data = [ "account"; name; string_of_float balance ] :: data in
-  print_string [ Background Green ] "\nNew account saved successfully!\n";
+  print_string [ Foreground Green ] "\nNew account saved successfully!\n";
   save_financial_data user new_data
 
 let rec prompt_add_account user =
   print_string [ Reset ] "\nEnter account name: ";
   let account_name = read_line () in
-  let () = print_string [ Reset ] "Enter initial balance: $" in
+  let () = print_string [ Reset ] "Enter initial balance: " in
   try
     let balance = float_of_string (read_line ()) in
     add_account user account_name balance
@@ -34,35 +34,37 @@ let rec prompt_add_account user =
     print_string [ Foreground Red ] "\nPlease enter a number!\n";
     prompt_add_account user
 
-let edit_account_balance user name operation amount =
-  let data = load_financial_data user in
-  try
-    let modified_data =
-      List.map
-        (fun row ->
-          if List.nth row 1 = name then
-            match operation with
-            | "add" ->
-                [
-                  "account";
-                  name;
-                  string_of_float (float_of_string (List.nth row 2) +. amount);
-                ]
-            | "subtract" ->
-                [
-                  "account";
-                  name;
-                  string_of_float (float_of_string (List.nth row 2) -. amount);
-                ]
-            | "set" -> [ "account"; name; string_of_float amount ]
-            | _ -> row
-          else row)
-        data
-    in
-    save_financial_data user modified_data
-  with _ ->
-    print_string [ Foreground Red ]
-      "\nYou do not have a account yet. Please add one to edit it.\n"
+let rec modify_account name operation amount (data : string list list) =
+  match data with
+  | [] -> []
+  | h :: (t : string list list) -> (
+      match h with
+      | [] -> modify_account name operation amount t
+      | _ :: (b : string) :: (c : string) :: _ when b = name -> (
+          match operation with
+          | "add" ->
+              [ "account"; name; string_of_float (float_of_string c +. amount) ]
+              :: t
+          | "subtract" ->
+              [ "account"; name; string_of_float (float_of_string c -. amount) ]
+              :: t
+          | "set" -> [ "account"; name; string_of_float amount ] :: t
+          | _ -> modify_account name operation amount t)
+      | _ :: _ -> modify_account name operation amount t)
+
+let rec edit_account_balance user name operation =
+  let () = print_string [ Reset ] "Enter amount: " in
+  let amount = float_of_string_opt (read_line ()) in
+  match amount with
+  | None ->
+      print_string [ Foreground Red ] "\nPlease enter a numerical amount!\n";
+      edit_account_balance user name operation
+  | Some amount ->
+      let data = load_financial_data user in
+      let modified_data = modify_account name operation amount data in
+      print_string [ Foreground Green ]
+        "\nAccount balance modified successfully!\n";
+      save_financial_data user modified_data
 
 let rec prompt_edit_account user =
   let () = print_string [ Reset ] "\nEnter account name to edit: " in
@@ -76,14 +78,7 @@ let rec prompt_edit_account user =
     if op <> "add" && op <> "subtract" && op <> "set" then (
       print_string [ Foreground Red ] "\nPlease input add, subtract, or set.\n";
       prompt_edit_account user)
-    else
-      try
-        let () = print_string [ Reset ] "Enter amount: " in
-        let amount = read_line () in
-        edit_account_balance user account_name op (float_of_string amount)
-      with _ ->
-        print_string [ Foreground Red ] "\nPlease enter a numerical amount!\n";
-        prompt_edit_account user
+    else edit_account_balance user account_name op
 
 (* credit cards *)
 let add_credit_card user name limit =

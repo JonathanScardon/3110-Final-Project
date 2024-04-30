@@ -203,7 +203,7 @@ and financial_interface user =
       "4. Edit funds in bank accounts\n";
       "5. Return to main menu\n";
     ];
-  print_string [ Bold ] "Please enter a command: ";
+  print_string [ Bold ] "Please choose an option (1-5): ";
   financial_input user
 
 and financial_input user =
@@ -237,7 +237,7 @@ and manage_stock_options user =
       "5. View stocks\n";
       "6. Return to financial menu\n";
     ];
-  print_string [ Bold ] "Select an option: ";
+  print_string [ Bold ] "Please choose an option (1-6): ";
   stock_input user
 
 and stock_input user =
