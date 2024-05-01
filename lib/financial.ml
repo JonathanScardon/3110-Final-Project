@@ -39,15 +39,24 @@ let add_account user name balance =
   print_string [ Foreground Green ] "\nNew account saved successfully!\n"
 
 let rec prompt_add_account user =
-  print_string [ Reset ] "\nEnter account name: ";
+  print_string [ Reset ]
+    "\nEnter 'back' to go back to the menu. \nEnter account name: ";
   let account_name = read_line () in
-  let () = print_string [ Reset ] "Enter initial balance: " in
-  try
-    let balance = float_of_string (read_line ()) in
-    add_account user account_name balance
-  with _ ->
-    print_string [ Foreground Red ] "\nPlease enter a number!\n";
-    prompt_add_account user
+  if account_name = "back" then ()
+  else if Data.search2 account_name (user_financial_file user) then (
+    print_string [ Foreground Red ] "\nThis account already exists!\n";
+    prompt_add_account user)
+  else
+    let () = print_string [ Reset ] "Enter initial balance: " in
+    try
+      let input = read_line () in
+      if input = "back" then ()
+      else
+        let balance = float_of_string input in
+        add_account user account_name balance
+    with _ ->
+      print_string [ Foreground Red ] "\nPlease enter a number!\n";
+      prompt_add_account user
 
 let rec modify_account name operation amount (data : string list list) =
   match data with
