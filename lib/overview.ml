@@ -198,10 +198,10 @@ and financial_interface user =
   print_strings [ Reset ]
     [
       "1. View personal stock spread\n";
-      "2. View all bank accounts\n";
-      "3. Add new account to bank\n";
-      "4. Edit funds in bank accounts\n";
-      "5. Add new credit card\n";
+      "2. Manage bank accounts";
+      "3. Manage credit cards";
+      "4. Make a transaction\n";
+      "5. See transaction log\n";
       "6. Return to main menu\n";
     ];
   print_string [ Bold ] "Please choose an option (1-6): ";
@@ -210,26 +210,82 @@ and financial_interface user =
 and financial_input user =
   let choice = read_line () in
   match choice with
-  | "1" ->
-      manage_stock_options user;
-      financial_interface user
-  | "2" ->
-      Financial.view_bank_accounts user;
-      Unix.sleep 2;
-      financial_interface user
-  | "3" ->
-      Financial.prompt_add_account user;
-      financial_interface user
+  | "1" -> manage_stock_options user
+  | "2" -> manage_accounts user
+  | "3" -> manage_credit user
   | "4" ->
-      Financial.prompt_edit_account user;
-      financial_interface user
+      ();
+      financial_input user
   | "5" ->
-      Financial.add_credit_card user;
-      financial_interface user
+      ();
+      financial_input user
   | "6" -> dashboard_login user
   | _ ->
       print_endline "Invalid option. Please try again.";
       financial_interface user
+
+and manage_accounts user =
+  print_string [ Reset; Bold; Foreground Blue ] "\nBank Accounts\n";
+  print_strings [ Reset ]
+    [
+      "1. View all bank accounts\n";
+      "2. Add new account to bank\n";
+      "3. Remove account from bank\n";
+      "4. Edit funds in bank accounts\n";
+      "5. Return to financial menu\n";
+    ];
+  print_string [ Bold ] "Please choose an option (1-5): ";
+  account_input user
+
+and account_input user =
+  let choice = read_line () in
+  match choice with
+  | "1" ->
+      Financial.view_bank_accounts user;
+      Unix.sleep 2;
+      manage_accounts user
+  | "2" ->
+      Financial.prompt_add_account user;
+      manage_accounts user
+  | "3" ->
+      ();
+      manage_accounts user
+  | "4" ->
+      Financial.prompt_edit_account user;
+      manage_accounts user
+  | "5" -> financial_interface user
+  | _ ->
+      print_endline "Invalid option. Please try again.";
+      manage_accounts user
+
+and manage_credit user =
+  print_string [ Reset; Bold; Foreground Blue ] "\nCredit Cards\n";
+  print_strings [ Reset ]
+    [
+      "1. Add new credit card\n";
+      "2. Remove credit card\n";
+      "3. Pay off credit card\n";
+      "4. Return to financial menu\n";
+    ];
+  print_string [ Bold ] "Please choose an option (1-4): ";
+  credit_input user
+
+and credit_input user =
+  let choice = read_line () in
+  match choice with
+  | "1" ->
+      Financial.add_credit_card user;
+      manage_credit user
+  | "2" ->
+      ();
+      manage_credit user
+  | "3" ->
+      ();
+      manage_credit user
+  | "4" -> financial_interface user
+  | _ ->
+      print_endline "Invalid option. Please try again.";
+      manage_credit user
 
 and manage_stock_options user =
   print_string [ Reset; Bold; Foreground Blue ] "\nStock Management\n";
