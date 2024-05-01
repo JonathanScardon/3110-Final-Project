@@ -78,49 +78,64 @@ let rec modify_account name operation amount (data : string list list) =
 
 let rec edit_account_balance user name operation =
   let () = print_string [ Reset ] "Enter amount: " in
-  let amount = float_of_string_opt (read_line ()) in
-  match amount with
-  | None ->
-      print_string [ Foreground Red ] "\nPlease enter a numerical amount!\n";
-      edit_account_balance user name operation
-  | Some amount ->
-      let data = load_financial_data user in
-      let modified_data = modify_account name operation amount data in
-      save_financial_data user modified_data;
-      print_string [ Foreground Green ]
-        "\nAccount balance modified successfully.\n"
+  let input = read_line () in
+  if input = "back" then ()
+  else
+    let amount = float_of_string_opt input in
+    match amount with
+    | None ->
+        print_string [ Foreground Red ] "\nPlease enter a numerical amount!\n";
+        edit_account_balance user name operation
+    | Some amount ->
+        let data = load_financial_data user in
+        let modified_data = modify_account name operation amount data in
+        save_financial_data user modified_data;
+        print_string [ Foreground Green ]
+          "\nAccount balance modified successfully.\n"
 
 let rec prompt_edit_account user =
-  let () = print_string [ Reset ] "\nEnter account name to edit: " in
+  let () =
+    print_string [ Reset ]
+      "\nEnter 'back' to go back to the menu. \nEnter account name to edit: "
+  in
   let account_name = read_line () in
-  if not (Data.search2 account_name (user_financial_file user)) then (
+  if account_name = "back" then ()
+  else if not (Data.search2 account_name (user_financial_file user)) then (
     print_string [ Foreground Red ] "\nThis account does not exist.\n";
     prompt_edit_account user)
   else
     let () = print_string [ Reset ] "Select operation (add/subtract/set): " in
     let op = read_line () in
-    if op <> "add" && op <> "subtract" && op <> "set" then (
+    if op = "back" then ()
+    else if op <> "add" && op <> "subtract" && op <> "set" then (
       print_string [ Foreground Red ] "\nPlease input add, subtract, or set.\n";
       prompt_edit_account user)
     else edit_account_balance user account_name op
 
 (* credit cards *)
 let rec add_credit_card user =
-  print_string [ Reset ] "\nEnter credit card name: ";
+  print_string [ Reset ]
+    "\nEnter 'back' to go back to the menu.\nEnter credit card name: ";
   let name = read_line () in
-  let () = print_string [ Reset ] "Enter credit limit: " in
-  let limit = float_of_string_opt (read_line ()) in
-  match limit with
-  | None ->
-      print_string [ Foreground Red ] "\nPlease enter a numerical limit!\n";
-      add_credit_card user
-  | Some limit ->
-      let data = load_financial_data user in
-      let new_data =
-        [ "credit_card"; name; string_of_float limit; "0.0" ] :: data
-      in
-      save_financial_data user new_data;
-      print_string [ Foreground Green ] "\nCredit card added successfully.\n"
+  if name = "back" then ()
+  else
+    let () = print_string [ Reset ] "Enter credit limit: " in
+    let input = read_line () in
+    if input = "back" then ()
+    else
+      let limit = float_of_string_opt input in
+      match limit with
+      | None ->
+          print_string [ Foreground Red ] "\nPlease enter a numerical limit!\n";
+          add_credit_card user
+      | Some limit ->
+          let data = load_financial_data user in
+          let new_data =
+            [ "credit_card"; name; string_of_float limit; "0.0" ] :: data
+          in
+          save_financial_data user new_data;
+          print_string [ Foreground Green ]
+            "\nCredit card added successfully.\n"
 
 let charge_credit_card user name amount =
   let data = load_financial_data user in
