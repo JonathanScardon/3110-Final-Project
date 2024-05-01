@@ -197,7 +197,7 @@ and financial_interface user =
   print_string [ Reset; Bold; Foreground Green ] "\nFinancial Tracker\n";
   print_strings [ Reset ]
     [
-      "1. View personal stock spread\n";
+      "1. Manage stocks\n";
       "2. Manage bank accounts\n";
       "3. Manage credit cards\n";
       "4. Manage transactions\n";
@@ -235,7 +235,7 @@ and account_input user =
   let choice = read_line () in
   match choice with
   | "1" ->
-      Financial.view_bank_accounts user;
+      Financial.view_financial user "account";
       Unix.sleep 2;
       manage_accounts user
   | "2" ->
@@ -256,27 +256,32 @@ and manage_credit user =
   print_string [ Reset; Bold; Foreground Blue ] "\nCredit Cards\n";
   print_strings [ Reset ]
     [
-      "1. Add new credit card\n";
-      "2. Remove credit card\n";
-      "3. Pay off credit card\n";
-      "4. Return to financial menu\n";
+      "1. View credit cards\n";
+      "2. Add new credit card\n";
+      "3. Remove credit card\n";
+      "4. Pay off credit card\n";
+      "5. Return to financial menu\n";
     ];
-  print_string [ Bold ] "Please choose an option (1-4): ";
+  print_string [ Bold ] "Please choose an option (1-5): ";
   credit_input user
 
 and credit_input user =
   let choice = read_line () in
   match choice with
   | "1" ->
-      Financial.add_credit_card user;
+      Financial.view_financial user "credit_card";
+      Unix.sleep 2;
       manage_credit user
   | "2" ->
-      ();
+      Financial.add_credit_card user;
       manage_credit user
   | "3" ->
       ();
       manage_credit user
-  | "4" -> financial_interface user
+  | "4" ->
+      ();
+      manage_credit user
+  | "5" -> financial_interface user
   | _ ->
       print_endline "Invalid option. Please try again.";
       manage_credit user

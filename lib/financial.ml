@@ -17,15 +17,19 @@ let save_financial_data user data =
 
 (* accounts *)
 
-let view_bank_accounts user =
+let view_financial user aspect =
   let sheet = Csv.load (user_financial_file user) in
-  print_endline "\nAccount | Balance";
+  let header =
+    if aspect = "account" then "\nAccount | Balance"
+    else "\nName | Limit | Debt"
+  in
+  print_endline header;
   print_endline
     (List.fold_right
        (fun lst acc ->
          match lst with
          | [] -> ""
-         | h :: t when h = "account" ->
+         | h :: t when h = aspect ->
              if acc <> "" then String.concat " " t ^ "\n" ^ acc
              else String.concat " " t
          | _ :: _ -> "")
