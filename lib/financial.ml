@@ -68,7 +68,8 @@ let rec modify_account name operation amount (data : string list list) =
   | h :: (t : string list list) -> (
       match h with
       | [] -> modify_account name operation amount t
-      | _ :: (b : string) :: (c : string) :: _ when b = name -> (
+      | a :: (b : string) :: (c : string) :: _ when a = "account" && b = name
+        -> (
           match operation with
           | "add" ->
               [ "account"; name; string_of_float (float_of_string c +. amount) ]
@@ -115,6 +116,38 @@ let rec prompt_edit_account user =
       print_string [ Foreground Red ] "\nPlease input add, subtract, or set.\n";
       prompt_edit_account user)
     else edit_account_balance user account_name op
+
+let rec remove_financial lst aspect name =
+  match lst with
+  | [] -> raise Not_found
+  | h :: t -> (
+      match h with
+      | [] -> remove_financial t aspect name
+      | a :: b :: _ when a = aspect && b = name -> t
+      | _ -> h :: remove_financial t aspect name)
+
+let rec remove_account user =
+  let path = user_financial_file user in
+  print_string [ Reset ]
+    "\nEnter 'back' to go back to the menu. \nEnter account name: ";
+  let account = read_line () in
+  if account = "back" then ()
+  else if account = "" then (
+    print_string [ Foreground Red ] "\nSorry, this account does not exist!\n";
+    remove_account user)
+  else
+    print_string [ Reset ]
+      ("\nAre you sure you want to remove account " ^ account ^ "? (y/n) ");
+  let confirm = read_line () in
+  if confirm <> "y" then ()
+  else
+    try
+      Csv.save path
+        (remove_financial (load_financial_data user) "account" account);
+      print_string [ Foreground Green ] "\nRemoved account successfully.\n"
+    with Not_found ->
+      print_string [ Foreground Red ] "Sorry, this account does not exist!\n";
+      remove_account user
 
 (* credit cards *)
 let rec add_credit_card user =

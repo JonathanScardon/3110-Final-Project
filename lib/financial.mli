@@ -11,3 +11,6 @@ val prompt_edit_account : string -> unit
 val add_credit_card : string -> unit
 (** [add_credit_card user] adds a new credit card with a user-specified
     name and credit limit. *)
+
+val remove_account : string -> unit
+(** [remove_account user] removes a bank account specified by the user. *)

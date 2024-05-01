@@ -242,7 +242,7 @@ and account_input user =
       Financial.prompt_add_account user;
       manage_accounts user
   | "3" ->
-      ();
+      Financial.remove_account user;
       manage_accounts user
   | "4" ->
       Financial.prompt_edit_account user;
