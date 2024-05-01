@@ -1,5 +1,6 @@
 (library
  (name final_project)
+ (flags :standard -w -32-33)
  (libraries
   csv
   cryptokit
@@ -7,6 +8,7 @@
   ANSITerminal
   cohttp
   cohttp-lwt-unix
+  curl
   yojson
   lwt)
  (preprocess
