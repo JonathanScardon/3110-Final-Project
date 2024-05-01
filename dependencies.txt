@@ -1,1 +1,2 @@
 opam install cohttp cohttp-lwt-unix yojson lwt
+sudo apt install curl

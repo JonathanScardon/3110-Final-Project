@@ -8,14 +8,21 @@ let month = string_of_int ((Unix.localtime (Unix.time ())).tm_mon + 1)
 let year = string_of_int ((Unix.localtime (Unix.time ())).tm_year + 1900)
 let curr_date = day ^ "-" ^ month ^ "-" ^ year
 
-let rec happiness_log () =
-  print_string [ Reset ] "Rate your happiness 1-10: ";
-  let happiness_lvl = read_line () in
+let get_user_input prompt =
+  print_string [ Reset ] prompt;
+  read_line ()
+
+let validate_happiness input =
   try
-    let hap_lvl_int = int_of_string happiness_lvl in
-    if hap_lvl_int >= 1 && hap_lvl_int <= 10 then happiness_lvl
-    else happiness_log ()
-  with Failure _ -> happiness_log ()
+    let hap_lvl_int = int_of_string input in
+    if hap_lvl_int >= 1 && hap_lvl_int <= 10 then Some hap_lvl_int else None
+  with Failure _ -> None
+
+let rec happiness_log () =
+  let input = get_user_input "Rate your happiness 1-10: " in
+  match validate_happiness input with
+  | Some valid_happiness -> string_of_int valid_happiness
+  | None -> happiness_log ()
 
 let see_history user =
   Data.see_history "\nDate | Happiness | Mood" ("data/" ^ user ^ "_mood.csv")
