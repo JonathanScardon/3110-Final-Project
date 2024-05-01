@@ -198,13 +198,12 @@ and financial_interface user =
   print_strings [ Reset ]
     [
       "1. View personal stock spread\n";
-      "2. Manage bank accounts";
-      "3. Manage credit cards";
-      "4. Make a transaction\n";
-      "5. See transaction log\n";
-      "6. Return to main menu\n";
+      "2. Manage bank accounts\n";
+      "3. Manage credit cards\n";
+      "4. Manage transactions\n";
+      "5. Return to main menu\n";
     ];
-  print_string [ Bold ] "Please choose an option (1-6): ";
+  print_string [ Bold ] "Please choose an option (1-5): ";
   financial_input user
 
 and financial_input user =
@@ -213,13 +212,8 @@ and financial_input user =
   | "1" -> manage_stock_options user
   | "2" -> manage_accounts user
   | "3" -> manage_credit user
-  | "4" ->
-      ();
-      financial_input user
-  | "5" ->
-      ();
-      financial_input user
-  | "6" -> dashboard_login user
+  | "4" -> manage_transac user
+  | "5" -> dashboard_login user
   | _ ->
       print_endline "Invalid option. Please try again.";
       financial_interface user
@@ -286,6 +280,31 @@ and credit_input user =
   | _ ->
       print_endline "Invalid option. Please try again.";
       manage_credit user
+
+and manage_transac user =
+  print_string [ Reset; Bold; Foreground Blue ] "\nCredit Cards\n";
+  print_strings [ Reset ]
+    [
+      "1. Make a transaction\n";
+      "2. See transaction log\n";
+      "3. Return to financial menu\n";
+    ];
+  print_string [ Bold ] "Please choose an option (1-3): ";
+  transac_input user
+
+and transac_input user =
+  let choice = read_line () in
+  match choice with
+  | "1" ->
+      ();
+      manage_transac user
+  | "2" ->
+      ();
+      manage_transac user
+  | "3" -> financial_interface user
+  | _ ->
+      print_endline "Invalid option. Please try again.";
+      manage_transac user
 
 and manage_stock_options user =
   print_string [ Reset; Bold; Foreground Blue ] "\nStock Management\n";
