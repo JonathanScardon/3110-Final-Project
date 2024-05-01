@@ -3,13 +3,6 @@ open Final_project.Auth
 open ANSITerminal
 
 let print_menu () =
-<<<<<<< HEAD
-  print_endline "Welcome to the Daily Life Planner (DLP)";
-  print_endline "1. Login";
-  print_endline "2. Register";
-  print_endline "3. Exit";
-  print_string "Please choose a number: "
-=======
   print_string [ Reset ] "\n";
 
   print_string [ Bold ] "\nWelcome to OCamLife\n";
@@ -18,7 +11,6 @@ let print_menu () =
   print_string [ Reset ] "3. Delete Account\n";
   print_string [ Reset ] "4. Exit\n";
   print_string [ Bold ] "Please choose an option: "
->>>>>>> 31bded538c13a1c4a3352c96b980207b31eed34a
 
 let rec process_choice () =
   try
