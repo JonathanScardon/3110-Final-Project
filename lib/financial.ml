@@ -218,15 +218,10 @@ let charge_credit_card user name amount =
       List.map
         (fun row ->
           match row with
-          | a :: b :: c :: _ when a = "credit_card" && b = name ->
-              if amount > float_of_string c then raise CreditLimitReached
-              else
-                [
-                  a;
-                  b;
-                  c;
-                  string_of_float (float_of_string (List.nth row 3) +. amount);
-                ]
+          | a :: b :: c :: d :: _ when a = "credit_card" && b = name ->
+              if amount > float_of_string c -. float_of_string d then
+                raise CreditLimitReached
+              else [ a; b; c; string_of_float (float_of_string d +. amount) ]
           | _ -> row)
         data
     in
