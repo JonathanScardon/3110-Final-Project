@@ -25,10 +25,11 @@ val add_user : string -> string -> bool
     @return [true] if the user was successfully added, [false] if the username 
       already exists. *)
 
-val authenticate : string -> string -> bool
+val authenticate : string -> string -> int -> bool
 (** [authenticate username password] checks if the given [username] and 
     [password] match a user in the credentials store.
     The password is hashed before comparison.
     @param username The username to authenticate.
     @param password The password to authenticate.
+    @param test_flag Used for testing exclusively
     @return [true] if the authentication is successful, [false] otherwise. *)

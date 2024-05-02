@@ -37,7 +37,7 @@ and login () =
   let username, password = request_credentials "Login" in
   if Final_project.Auth.username_exists username = false then
     username_doesnt_exist ()
-  else if authenticate username password then login_success username
+  else if authenticate username password 0 then login_success username
   else login_failure ()
 
 and register () =
@@ -50,7 +50,7 @@ and delete () =
   let username, password = request_credentials "Login" in
   if Final_project.Auth.username_exists username = false then
     username_doesnt_exist ()
-  else if authenticate username password then (
+  else if authenticate username password 0 then (
     print_string [ Reset ]
       "Are you sure you want to delete your account? (y/n) ";
     if read_line () = "y" then (

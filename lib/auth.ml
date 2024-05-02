@@ -4,14 +4,16 @@ open ANSITerminal
 (* Cite ChatGPT for cryptokit password hashing *)
 
 let credentials_path test_flag =
-  if test_flag = 1 then "data/for_testing/test_auth.csv"
+  if test_flag = 1 then "data/for_testing/auth_test.csv"
   else "data/user_credentials.csv"
 
 let username_exists username =
   let credentials = Csv.load (credentials_path 0) in
   List.exists (fun row -> List.nth row 0 = username) credentials
 
-let hash_password password = hash_string (Hash.sha256 ()) password
+let hash_password password =
+  let hash = hash_string (Hash.sha256 ()) password in
+  transform_string (Hexa.encode ()) hash
 
 let add_user username hashed_password =
   try
@@ -39,7 +41,6 @@ let add_user username hashed_password =
       create_user_file ("data/" ^ username ^ "_lunch.csv") [];
       create_user_file ("data/" ^ username ^ "_dinner.csv") [];
       create_user_file ("data/" ^ username ^ "_financials.csv") [ [] ];
-      (* Check for the existence of default files before copying *)
       let copy_defaults src_file dest_file =
         if Sys.file_exists src_file then
           let data = Csv.load src_file in
@@ -66,13 +67,12 @@ let add_user username hashed_password =
            (Printexc.to_string e));
       false
 
-let authenticate username password =
-  let credentials = Csv.load (credentials_path 0) in
+let authenticate username password test_flag =
+  let credentials = Csv.load (credentials_path test_flag) in
   List.exists
     (fun row ->
       let stored_username = List.nth row 0 in
       let stored_hashed_password = List.nth row 1 in
-      stored_username = username
-      && stored_hashed_password = hash_password password)
+      let password_hash = hash_password password in
+      stored_username = username && stored_hashed_password = password_hash)
     credentials
-(**)
