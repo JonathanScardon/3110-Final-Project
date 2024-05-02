@@ -211,28 +211,6 @@ let rec remove_credit user =
           "Sorry, this credit card does not exist!\n";
         remove_credit user)
 
-let charge_credit_card user name amount =
-  let data = load_financial_data user in
-  try
-    let modified_data =
-      List.map
-        (fun row ->
-          match row with
-          | a :: b :: c :: d :: _ when a = "credit_card" && b = name ->
-              if amount > float_of_string c -. float_of_string d then
-                raise CreditLimitReached
-              else [ a; b; c; string_of_float (float_of_string d +. amount) ]
-          | _ -> row)
-        data
-    in
-    save_financial_data user modified_data
-  with
-  | CreditLimitReached ->
-      print_string [ Foreground Red ]
-        "\nYou cannot spend money past your credit limit!\n"
-  | _ ->
-      print_string [ Foreground Red ] "\nYou do not have a credit card yet.\n"
-
 (* Cross functionality *)
 
 let pay_credit_card_balance user credit_name account_name amount =
@@ -286,6 +264,29 @@ let log_transaction user t_type date amount entity =
   Csv.save path updated_data;
   print_string [ Foreground Green ] "\nTransaction made successfully!\n"
 
+let charge_credit_card user card typ amount entity =
+  let data = load_financial_data user in
+  try
+    let modified_data =
+      List.map
+        (fun row ->
+          match row with
+          | a :: b :: c :: d :: _ when a = "credit_card" && b = card ->
+              if amount > float_of_string c -. float_of_string d then
+                raise CreditLimitReached
+              else [ a; b; c; string_of_float (float_of_string d +. amount) ]
+          | _ -> row)
+        data
+    in
+    save_financial_data user modified_data;
+    log_transaction user typ curr_date amount entity
+  with
+  | CreditLimitReached ->
+      print_string [ Foreground Red ]
+        "\nYou cannot spend money past your credit limit!\n"
+  | _ ->
+      print_string [ Foreground Red ] "\nYou do not have a credit card yet.\n"
+
 let rec make_transaction user =
   try
     print_string [ Reset ]
@@ -314,9 +315,7 @@ let rec make_transaction user =
             "\nEnter the person/company receiving the money: ";
           let entity = read_line () in
           if entity = "back" then ()
-          else (
-            charge_credit_card user card amount;
-            log_transaction user typ curr_date amount entity)))
+          else charge_credit_card user card typ amount entity))
   with _ ->
     print_string [ Foreground Red ] "\nPlease enter a numerical amount.\n";
     make_transaction user
