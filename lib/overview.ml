@@ -287,7 +287,7 @@ and credit_input user =
       manage_credit user
 
 and manage_transac user =
-  print_string [ Reset; Bold; Foreground Blue ] "\nCredit Cards\n";
+  print_string [ Reset; Bold; Foreground Blue ] "\nTransactions\n";
   print_strings [ Reset ]
     [
       "1. Make a transaction\n";
@@ -301,8 +301,7 @@ and transac_input user =
   let choice = read_line () in
   match choice with
   | "1" ->
-      Financial.log_transaction user "type" "x" 10. "description" "entity";
-      Unix.sleep 2;
+      Financial.make_transaction user;
       manage_transac user
   | "2" ->
       Financial.view_transactions user;

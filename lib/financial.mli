@@ -19,6 +19,4 @@ val remove_credit : string -> unit
 (** [remove_credit user] removes a credit card specified by the user. *)
 
 val view_transactions : string -> unit
-
-val log_transaction :
-  string -> string -> string -> float -> string -> string -> unit
+val make_transaction : string -> unit

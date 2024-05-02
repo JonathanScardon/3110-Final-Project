@@ -5,6 +5,10 @@ open ANSITerminal
    type credit_card = { name : string; limit : float; balance : float }
    type transaction = { date : string; amount : float; description : string } *)
 
+let day = string_of_int (Unix.localtime (Unix.time ())).tm_mday
+let month = string_of_int ((Unix.localtime (Unix.time ())).tm_mon + 1)
+let year = string_of_int ((Unix.localtime (Unix.time ())).tm_year + 1900)
+let curr_date = day ^ "-" ^ month ^ "-" ^ year
 let user_financial_file user = "data/" ^ user ^ "_financials.csv"
 
 let load_financial_data user =
@@ -270,31 +274,50 @@ let pay_credit_card_balance user credit_name account_name amount =
 
 let user_transaction_log_file user = "data/" ^ user ^ "_transaction_log.csv"
 
-(* let make_transaction user =
-   print_string [ Reset ]
-     "\nEnter 'back' to go back to the menu. \nEnter credit card name: ";
-   let card = read_line () in
-   if card = "back" then ()
-   else if card = "" then (
-     print_string [ Foreground Red ]
-       "\nSorry, this credit card does not exist!\n";
-     remove_credit user) *)
-
-let log_transaction user t_type date amount description entity =
+let log_transaction user t_type date amount entity =
   let path = user_transaction_log_file user in
   let data = Csv.load path in
-  let new_entry =
-    [ t_type; date; string_of_float amount; description; entity ]
-  in
+  let new_entry = [ date; t_type; string_of_float amount; entity ] in
   let updated_data = new_entry :: data in
   Csv.save path updated_data
 
-let load_transaction_log user =
-  let path = user_transaction_log_file user in
-  if Sys.file_exists path then Csv.load path else []
+let rec make_transaction user =
+  try
+    print_string [ Reset ]
+      "\nEnter 'back' to go back to the menu. \nEnter credit card name: ";
+    let card = read_line () in
+    if card = "back" then ()
+    else if
+      card = ""
+      || not (Data.search2 "credit_card" card (user_financial_file user))
+    then (
+      print_string [ Foreground Red ]
+        "\nSorry, this credit card does not exist!\n";
+      make_transaction user)
+    else (
+      print_string [ Reset ]
+        "\nEnter type of transaction (bill, shopping, etc): ";
+      let typ = read_line () in
+      if typ = "back" then ()
+      else (
+        print_string [ Reset ] "\nEnter amount of money: ";
+        let amount = read_line () in
+        if amount = "back" then ()
+        else
+          let amount = float_of_string amount in
+          print_string [ Reset ]
+            "\nEnter the person/company receiving the money: ";
+          let entity = read_line () in
+          if entity = "back" then ()
+          else log_transaction user typ curr_date amount entity;
+          charge_credit_card user card amount;
+          print_string [ Foreground Green ] "\nTransaction made successfully!\n"))
+  with _ ->
+    print_string [ Foreground Red ] "\nPlease enter a numerical amount.\n";
+    make_transaction user
 
 let view_transactions user =
-  Data.see_history "\nType | Date | Amount | Description | Entity"
+  Data.see_history "\nType | Date | Amount | Company/Person"
     (user_transaction_log_file user)
 
 (* total balance *)
