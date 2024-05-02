@@ -14,3 +14,6 @@ val add_credit_card : string -> unit
 
 val remove_account : string -> unit
 (** [remove_account user] removes a bank account specified by the user. *)
+
+val remove_credit : string -> unit
+(** [remove_credit user] removes a credit card specified by the user. *)

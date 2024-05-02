@@ -47,7 +47,7 @@ let rec prompt_add_account user =
     "\nEnter 'back' to go back to the menu. \nEnter account name: ";
   let account_name = read_line () in
   if account_name = "back" then ()
-  else if Data.search2 account_name (user_financial_file user) then (
+  else if Data.search2 "account" account_name (user_financial_file user) then (
     print_string [ Foreground Red ] "\nThis account already exists!\n";
     prompt_add_account user)
   else
@@ -105,7 +105,8 @@ let rec prompt_edit_account user =
   in
   let account_name = read_line () in
   if account_name = "back" then ()
-  else if not (Data.search2 account_name (user_financial_file user)) then (
+  else if not (Data.search2 "account" account_name (user_financial_file user))
+  then (
     print_string [ Foreground Red ] "\nThis account does not exist.\n";
     prompt_edit_account user)
   else
@@ -132,22 +133,23 @@ let rec remove_account user =
     "\nEnter 'back' to go back to the menu. \nEnter account name: ";
   let account = read_line () in
   if account = "back" then ()
-  else if account = "" then (
-    print_string [ Foreground Red ] "\nSorry, this account does not exist!\n";
-    remove_account user)
-  else
-    print_string [ Reset ]
-      ("\nAre you sure you want to remove account " ^ account ^ "? (y/n) ");
-  let confirm = read_line () in
-  if confirm <> "y" then ()
-  else
-    try
-      Csv.save path
-        (remove_financial (load_financial_data user) "account" account);
-      print_string [ Foreground Green ] "\nRemoved account successfully.\n"
-    with Not_found ->
-      print_string [ Foreground Red ] "Sorry, this account does not exist!\n";
-      remove_account user
+  else (
+    if account = "" then (
+      print_string [ Foreground Red ] "\nSorry, this account does not exist!\n";
+      remove_account user)
+    else
+      print_string [ Reset ]
+        ("\nAre you sure you want to remove account " ^ account ^ "? (y/n) ");
+    let confirm = read_line () in
+    if confirm <> "y" then ()
+    else
+      try
+        Csv.save path
+          (remove_financial (load_financial_data user) "account" account);
+        print_string [ Foreground Green ] "\nRemoved account successfully.\n"
+      with Not_found ->
+        print_string [ Foreground Red ] "Sorry, this account does not exist!\n";
+        remove_account user)
 
 (* credit cards *)
 let rec add_credit_card user =
@@ -155,6 +157,9 @@ let rec add_credit_card user =
     "\nEnter 'back' to go back to the menu.\nEnter credit card name: ";
   let name = read_line () in
   if name = "back" then ()
+  else if Data.search2 "credit_card" name (user_financial_file user) then (
+    print_string [ Foreground Red ] "\nThis credit card already exists!\n";
+    add_credit_card user)
   else
     let () = print_string [ Reset ] "Enter credit limit: " in
     let input = read_line () in
@@ -173,6 +178,32 @@ let rec add_credit_card user =
           save_financial_data user new_data;
           print_string [ Foreground Green ]
             "\nCredit card added successfully.\n"
+
+let rec remove_credit user =
+  let path = user_financial_file user in
+  print_string [ Reset ]
+    "\nEnter 'back' to go back to the menu. \nEnter credit card name: ";
+  let card = read_line () in
+  if card = "back" then ()
+  else if card = "" then (
+    print_string [ Foreground Red ]
+      "\nSorry, this credit card does not exist!\n";
+    remove_credit user)
+  else (
+    print_string [ Reset ]
+      ("\nAre you sure you want to remove credit card " ^ card ^ "? (y/n) ");
+    let confirm = read_line () in
+    if confirm <> "y" then ()
+    else
+      try
+        Csv.save path
+          (remove_financial (load_financial_data user) "credit_card" card);
+        print_string [ Foreground Green ]
+          "\nRemoved credit card successfully.\n"
+      with Not_found ->
+        print_string [ Foreground Red ]
+          "Sorry, this credit card does not exist!\n";
+        remove_credit user)
 
 let charge_credit_card user name amount =
   let data = load_financial_data user in

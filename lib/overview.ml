@@ -276,7 +276,7 @@ and credit_input user =
       Financial.add_credit_card user;
       manage_credit user
   | "3" ->
-      ();
+      Financial.remove_credit user;
       manage_credit user
   | "4" ->
       ();

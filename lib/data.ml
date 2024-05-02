@@ -72,9 +72,10 @@ let search id path =
   try List.exists (fun row -> List.nth row 0 = id) sheet
   with Failure _ -> false
 
-let search2 id path =
+let search2 id1 id2 path =
   let sheet = Csv.load path in
-  try List.exists (fun row -> List.nth row 1 = id) sheet
+  try
+    List.exists (fun row -> List.nth row 0 = id1 && List.nth row 1 = id2) sheet
   with Failure _ -> false
 
 let find_entry id path =
