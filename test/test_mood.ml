@@ -46,6 +46,8 @@ let suite =
          "get_only_quote" >:: test_get_only_quote;
        ]
 
+(* Cite ChatGPT for appropriate navigation to correct root bc otherwise
+   it wouldn't work right weirdly. *)
 let rec find_and_set_directory target_dir =
   let current_dir = Sys.getcwd () in
   if Filename.basename current_dir = target_dir then current_dir
