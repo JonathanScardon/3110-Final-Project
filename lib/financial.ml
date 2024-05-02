@@ -215,14 +215,20 @@ let charge_credit_card user name amount =
     let modified_data =
       List.map
         (fun row ->
-          if List.nth row 1 = name then
-            [
-              "credit_card";
-              name;
-              List.nth row 2
-              ^ string_of_float (float_of_string (List.nth row 3) +. amount);
-            ]
-          else row)
+          match row with
+          | a :: b :: c :: _ when a = "credit_card" && b = name ->
+              if amount > float_of_string c then (
+                print_string [ Foreground Red ]
+                  "\nYou cannot spend money past your credit limit!\n";
+                row)
+              else
+                [
+                  a;
+                  b;
+                  c;
+                  string_of_float (float_of_string (List.nth row 3) +. amount);
+                ]
+          | _ -> row)
         data
     in
     save_financial_data user modified_data
@@ -317,7 +323,7 @@ let rec make_transaction user =
     make_transaction user
 
 let view_transactions user =
-  Data.see_history "\nType | Date | Amount | Company/Person"
+  Data.see_history "\nDate | Type | Amount | Company/Person"
     (user_transaction_log_file user)
 
 (* total balance *)
