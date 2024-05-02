@@ -1,6 +1,8 @@
 open Data
 open ANSITerminal
 
+exception CreditLimitReached
+
 (* type account = { name : string; balance : float }
    type credit_card = { name : string; limit : float; balance : float }
    type transaction = { date : string; amount : float; description : string } *)
@@ -217,10 +219,7 @@ let charge_credit_card user name amount =
         (fun row ->
           match row with
           | a :: b :: c :: _ when a = "credit_card" && b = name ->
-              if amount > float_of_string c then (
-                print_string [ Foreground Red ]
-                  "\nYou cannot spend money past your credit limit!\n";
-                row)
+              if amount > float_of_string c then raise CreditLimitReached
               else
                 [
                   a;
@@ -232,8 +231,12 @@ let charge_credit_card user name amount =
         data
     in
     save_financial_data user modified_data
-  with _ ->
-    print_string [ Foreground Red ] "\nYou do not have a credit card yet.\n"
+  with
+  | CreditLimitReached ->
+      print_string [ Foreground Red ]
+        "\nYou cannot spend money past your credit limit!\n"
+  | _ ->
+      print_string [ Foreground Red ] "\nYou do not have a credit card yet.\n"
 
 (* Cross functionality *)
 
