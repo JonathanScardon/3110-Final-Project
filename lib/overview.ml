@@ -279,7 +279,7 @@ and credit_input user =
       Financial.remove_credit user;
       manage_credit user
   | "4" ->
-      ();
+      Financial.prompt_pay_credit user;
       manage_credit user
   | "5" -> financial_interface user
   | _ ->

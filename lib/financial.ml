@@ -68,26 +68,31 @@ let rec prompt_add_account user =
       print_string [ Foreground Red ] "\nPlease enter a number!\n";
       prompt_add_account user
 
-let rec modify_account name operation amount (data : string list list) =
+let rec modify_financial name operation amount (data : string list list) aspect
+    =
   match data with
   | [] -> []
   | h :: (t : string list list) -> (
       match h with
-      | [] -> modify_account name operation amount t
-      | a :: (b : string) :: (c : string) :: _ when a = "account" && b = name
-        -> (
+      | [] -> modify_financial name operation amount t aspect
+      | a :: (b : string) :: (c : string) :: _ when a = aspect && b = name -> (
           match operation with
           | "add" ->
-              [ "account"; name; string_of_float (float_of_string c +. amount) ]
+              [ aspect; name; string_of_float (float_of_string c +. amount) ]
               :: t
           | "subtract" ->
-              [ "account"; name; string_of_float (float_of_string c -. amount) ]
+              [ aspect; name; string_of_float (float_of_string c -. amount) ]
               :: t
-          | "set" -> [ "account"; name; string_of_float amount ] :: t
-          | _ -> modify_account name operation amount t)
-      | _ :: _ -> modify_account name operation amount t)
+          | "set" -> [ aspect; name; string_of_float amount ] :: t
+          | _ -> modify_financial name operation amount t aspect)
+      | _ :: _ -> modify_financial name operation amount t aspect)
 
-let rec edit_account_balance user name operation =
+let edit_account_balance user name operation amount =
+  let data = load_financial_data user in
+  let modified_data = modify_financial name operation amount data "account" in
+  save_financial_data user modified_data
+
+let rec prompt_edit_account_amt user name operation =
   let () = print_string [ Reset ] "Enter amount: " in
   let input = read_line () in
   if input = "back" then ()
@@ -96,11 +101,9 @@ let rec edit_account_balance user name operation =
     match amount with
     | None ->
         print_string [ Foreground Red ] "\nPlease enter a numerical amount!\n";
-        edit_account_balance user name operation
+        prompt_edit_account_amt user name operation
     | Some amount ->
-        let data = load_financial_data user in
-        let modified_data = modify_account name operation amount data in
-        save_financial_data user modified_data;
+        edit_account_balance user name operation amount;
         print_string [ Foreground Green ]
           "\nAccount balance modified successfully.\n"
 
@@ -122,7 +125,7 @@ let rec prompt_edit_account user =
     else if op <> "add" && op <> "subtract" && op <> "set" then (
       print_string [ Foreground Red ] "\nPlease input add, subtract, or set.\n";
       prompt_edit_account user)
-    else edit_account_balance user account_name op
+    else prompt_edit_account_amt user account_name op
 
 let rec remove_financial lst aspect name =
   match lst with
@@ -211,6 +214,13 @@ let rec remove_credit user =
           "Sorry, this credit card does not exist!\n";
         remove_credit user)
 
+let edit_credit_balance user name operation amount =
+  let data = load_financial_data user in
+  let modified_data =
+    modify_financial name operation amount data "credit_card"
+  in
+  save_financial_data user modified_data
+
 (* Cross functionality *)
 
 let pay_credit_card_balance user credit_name account_name amount =
@@ -221,36 +231,66 @@ let pay_credit_card_balance user credit_name account_name amount =
         List.nth row 1 = credit_name && List.nth row 0 = "credit_card")
       data
   in
-  let account, others =
+  let account, _ =
     List.partition
       (fun row -> List.nth row 1 = account_name && List.nth row 0 = "account")
       others
   in
   match (credit_card, account) with
-  | ( [ [ "credit_card"; _; limit; balance ] ],
-      [ [ "account"; _; account_balance ] ] ) ->
+  | [ [ "credit_card"; _; _; balance ] ], [ [ "account"; _; account_balance ] ]
+    ->
       let balance = float_of_string balance in
       let account_balance = float_of_string account_balance in
       let pay_amount = min balance (min amount account_balance) in
-      if pay_amount > 0.0 then (
+      if pay_amount > 0.0 && account_balance > amount then (
         let new_credit_balance = balance -. pay_amount in
         let new_account_balance = account_balance -. pay_amount in
-        let new_data =
-          [
-            "credit_card";
-            credit_name;
-            limit;
-            string_of_float new_credit_balance;
-          ]
-          :: [ "account"; account_name; string_of_float new_account_balance ]
-          :: others
-        in
-        save_financial_data user new_data;
+        edit_account_balance user account_name "subtract" new_account_balance;
+        edit_credit_balance user account_name "subtract" new_credit_balance;
         print_string [ Foreground Green ] "\nPayment successful.\n")
       else
         print_string [ Foreground Red ]
           "\nInvalid payment amount or insufficient funds.\n"
   | _ -> print_string [ Foreground Red ] "\nCredit card or account not found.\n"
+
+let rec prompt_pay_credit user =
+  try
+    print_string [ Reset ]
+      "\nEnter 'back' to go back to the menu. \nEnter credit card name: ";
+    let card = read_line () in
+    if card = "back" then ()
+    else if
+      card = ""
+      || not (Data.search2 "credit_card" card (user_financial_file user))
+    then (
+      print_string [ Foreground Red ]
+        "\n\
+         Sorry, this credit card does not exist! If you do not have a card, \
+         please add one.\n";
+      prompt_pay_credit user)
+    else (
+      print_string [ Reset ] "\nEnter bank account name: ";
+      let account = read_line () in
+      if account = "back" then ()
+      else if
+        account = ""
+        || not (Data.search2 "account" account (user_financial_file user))
+      then (
+        print_string [ Foreground Red ]
+          "\n\
+           Sorry, this bank account does not exist! If you do not have an \
+           account, please add one.\n";
+        prompt_pay_credit user)
+      else (
+        print_string [ Reset ] "\nEnter amount of money to transfer: ";
+        let amount = read_line () in
+        if amount = "back" then ()
+        else
+          let amount = float_of_string amount in
+          pay_credit_card_balance user card account amount))
+  with _ ->
+    print_string [ Foreground Red ] "\nPlease enter a numerical amount.\n";
+    prompt_pay_credit user
 
 (* transactions *)
 

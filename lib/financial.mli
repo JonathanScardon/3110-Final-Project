@@ -20,3 +20,4 @@ val remove_credit : string -> unit
 
 val view_transactions : string -> unit
 val make_transaction : string -> unit
+val prompt_pay_credit : string -> unit
