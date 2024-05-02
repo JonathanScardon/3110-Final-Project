@@ -3,19 +3,12 @@ open Cryptokit
 open ANSITerminal
 (* Cite ChatGPT for cryptokit password hashing *)
 
-let credentials_path () =
-  let path =
-    match Sys.getenv_opt "CREDENTIALS_PATH" with
-    | Some path -> path
-    | None -> (
-        match Sys.getenv_opt "ENV" with
-        | Some "test" -> "test/test_auth.csv"
-        | _ -> "data/user_credentials.csv")
-  in
-  path
+let credentials_path test_flag =
+  if test_flag = 1 then "data/for_testing/test_auth.csv"
+  else "data/user_credentials.csv"
 
 let username_exists username =
-  let credentials = Csv.load (credentials_path ()) in
+  let credentials = Csv.load (credentials_path 0) in
   List.exists (fun row -> List.nth row 0 = username) credentials
 
 let hash_password password = hash_string (Hash.sha256 ()) password
@@ -27,10 +20,9 @@ let add_user username hashed_password =
         (Printf.sprintf "Username %s already exists.\n" username);
       false)
     else
-      let credentials = Csv.load (credentials_path ()) in
-      Csv.save (credentials_path ())
+      let credentials = Csv.load (credentials_path 0) in
+      Csv.save (credentials_path 0)
         (credentials @ [ [ username; hashed_password ] ]);
-      (* Attempt to create necessary user files and handle each failure separately *)
       let create_user_file file data =
         try
           Csv.save file data;
@@ -75,7 +67,7 @@ let add_user username hashed_password =
       false
 
 let authenticate username password =
-  let credentials = Csv.load (credentials_path ()) in
+  let credentials = Csv.load (credentials_path 0) in
   List.exists
     (fun row ->
       let stored_username = List.nth row 0 in

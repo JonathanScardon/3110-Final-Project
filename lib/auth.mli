@@ -1,7 +1,8 @@
 (* auth.mli *)
 
-val credentials_path : unit -> string
-(** Returns the path to the CSV file storing user credentials. *)
+val credentials_path : int -> string
+(** Returns the path to the CSV file storing user credentials. 
+    @param [test_path] is a flag to determine directory purely for testing. *)
 
 val username_exists : string -> bool
 (** [username_exists username] checks if the given [username] exists in the 
