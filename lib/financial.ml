@@ -270,6 +270,16 @@ let pay_credit_card_balance user credit_name account_name amount =
 
 let user_transaction_log_file user = "data/" ^ user ^ "_transaction_log.csv"
 
+(* let make_transaction user =
+   print_string [ Reset ]
+     "\nEnter 'back' to go back to the menu. \nEnter credit card name: ";
+   let card = read_line () in
+   if card = "back" then ()
+   else if card = "" then (
+     print_string [ Foreground Red ]
+       "\nSorry, this credit card does not exist!\n";
+     remove_credit user) *)
+
 let log_transaction user t_type date amount description entity =
   let path = user_transaction_log_file user in
   let data = Csv.load path in
@@ -283,16 +293,9 @@ let load_transaction_log user =
   let path = user_transaction_log_file user in
   if Sys.file_exists path then Csv.load path else []
 
-let view_transaction_history user limit =
-  let transactions = load_transaction_log user in
-  let limited_transactions =
-    match limit with Some l -> take l transactions | None -> transactions
-  in
-  List.iter
-    (fun row ->
-      Printf.printf "%s, %s, %s, %s, %s\n" (List.nth row 0) (List.nth row 1)
-        (List.nth row 2) (List.nth row 3) (List.nth row 4))
-    limited_transactions
+let view_transactions user =
+  Data.see_history "\nType | Date | Amount | Description | Entity"
+    (user_transaction_log_file user)
 
 (* total balance *)
 

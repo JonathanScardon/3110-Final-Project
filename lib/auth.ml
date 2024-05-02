@@ -34,13 +34,14 @@ let add_user username hashed_password =
           print_string [ Foreground Red ]
             (Printf.sprintf "Failed to create file %s: %s\n" file msg)
       in
-      create_user_file ("data/" ^ username ^ "_mood.csv") [ [] ];
-      create_user_file ("data/" ^ username ^ "_food.csv") [ [] ];
-      create_user_file ("data/" ^ username ^ "_exercise.csv") [ [] ];
+      create_user_file ("data/" ^ username ^ "_mood.csv") [];
+      create_user_file ("data/" ^ username ^ "_food.csv") [];
+      create_user_file ("data/" ^ username ^ "_exercise.csv") [];
       create_user_file ("data/" ^ username ^ "_breakfast.csv") [];
       create_user_file ("data/" ^ username ^ "_lunch.csv") [];
       create_user_file ("data/" ^ username ^ "_dinner.csv") [];
-      create_user_file ("data/" ^ username ^ "_financials.csv") [ [] ];
+      create_user_file ("data/" ^ username ^ "_financials.csv") [];
+      create_user_file ("data/" ^ username ^ "_transaction_log.csv") [];
       let copy_defaults src_file dest_file =
         if Sys.file_exists src_file then
           let data = Csv.load src_file in
