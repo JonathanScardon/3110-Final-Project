@@ -242,7 +242,7 @@ let pay_credit_card_balance user credit_name account_name amount =
       let balance = float_of_string balance in
       let account_balance = float_of_string account_balance in
       let pay_amount = min balance (min amount account_balance) in
-      if pay_amount > 0.0 && account_balance > amount then (
+      if pay_amount > 0.0 && account_balance >= amount then (
         let new_credit_balance = balance -. pay_amount in
         let new_account_balance = account_balance -. pay_amount in
         edit_account_balance user account_name "subtract" new_account_balance;
