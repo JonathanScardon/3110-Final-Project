@@ -46,4 +46,29 @@ let suite =
          "get_only_quote" >:: test_get_only_quote;
        ]
 
-let () = run_test_tt_main suite
+let rec find_and_set_directory target_dir =
+  let current_dir = Sys.getcwd () in
+  if Filename.basename current_dir = target_dir then current_dir
+    (* Found the directory *)
+  else if current_dir = "/" then
+    failwith "Reached the root directory, target directory not found."
+  else (
+    Sys.chdir "../";
+    (* Go up one level *)
+    find_and_set_directory target_dir (* Recursive call *))
+
+let () =
+  let target_directory = "3110-final-project" in
+  try
+    let found_dir = find_and_set_directory target_directory in
+    Sys.chdir found_dir;
+    (* Set the working directory *)
+    Printf.printf "Changed to directory: %s\n" (Sys.getcwd ());
+    run_test_tt_main suite
+  with
+  | Failure msg -> Printf.printf "Error: %s\n" msg
+  | Sys_error msg -> Printf.printf "System error: %s\n" msg
+
+let () =
+  Printf.printf "Current working directory: %s\n" (Sys.getcwd ());
+  run_test_tt_main suite
