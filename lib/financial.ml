@@ -283,7 +283,8 @@ let log_transaction user t_type date amount entity =
   let data = Csv.load path in
   let new_entry = [ date; t_type; string_of_float amount; entity ] in
   let updated_data = new_entry :: data in
-  Csv.save path updated_data
+  Csv.save path updated_data;
+  print_string [ Foreground Green ] "\nTransaction made successfully!\n"
 
 let rec make_transaction user =
   try
@@ -313,9 +314,9 @@ let rec make_transaction user =
             "\nEnter the person/company receiving the money: ";
           let entity = read_line () in
           if entity = "back" then ()
-          else log_transaction user typ curr_date amount entity;
-          charge_credit_card user card amount;
-          print_string [ Foreground Green ] "\nTransaction made successfully!\n"))
+          else (
+            charge_credit_card user card amount;
+            log_transaction user typ curr_date amount entity)))
   with _ ->
     print_string [ Foreground Red ] "\nPlease enter a numerical amount.\n";
     make_transaction user
