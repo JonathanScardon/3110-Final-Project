@@ -68,8 +68,7 @@ let rec prompt_add_account user =
       print_string [ Foreground Red ] "\nPlease enter a number!\n";
       prompt_add_account user
 
-let rec modify_financial name operation amount (data : string list list) aspect
-    =
+let rec modify_financial name operation amount data aspect =
   match data with
   | [] -> []
   | h :: (t : string list list) -> (
@@ -304,20 +303,21 @@ let log_transaction user t_type date amount entity =
   Csv.save path updated_data;
   print_string [ Foreground Green ] "\nTransaction made successfully!\n"
 
+let modify_credit_data card amount data =
+  List.map
+    (fun row ->
+      match row with
+      | a :: b :: c :: d :: _ when a = "credit_card" && b = card ->
+          if amount > float_of_string c -. float_of_string d then
+            raise CreditLimitReached
+          else [ a; b; c; string_of_float (float_of_string d +. amount) ]
+      | _ -> row)
+    data
+
 let charge_credit_card user card typ amount entity =
   let data = load_financial_data user in
   try
-    let modified_data =
-      List.map
-        (fun row ->
-          match row with
-          | a :: b :: c :: d :: _ when a = "credit_card" && b = card ->
-              if amount > float_of_string c -. float_of_string d then
-                raise CreditLimitReached
-              else [ a; b; c; string_of_float (float_of_string d +. amount) ]
-          | _ -> row)
-        data
-    in
+    let modified_data = modify_credit_data card amount data in
     save_financial_data user modified_data;
     log_transaction user typ curr_date amount entity
   with
