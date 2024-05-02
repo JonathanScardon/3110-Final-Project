@@ -1,5 +1,5 @@
-(test
- (name test_auth)
+(tests
+ (names test_auth test_mood)
  (flags :standard -w -32-33)
  (preprocess
   (pps bisect_ppx))
