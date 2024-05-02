@@ -1,0 +1,8 @@
+Manually test unix functions to ensure their dates line up for getting
+times of day and sleeping as necessary.
+
+Test manually that output looks correct and appropriate for layout
+
+Recursive menu I/O will be manually tested.
+
+Aim to test any function that doesn't return unit. 
