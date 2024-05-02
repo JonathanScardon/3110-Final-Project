@@ -57,6 +57,8 @@ let rec find_and_set_directory target_dir =
     Sys.chdir "../";
     find_and_set_directory target_dir)
 
+(* WE REALLY NEED TO MAKE SURE WE CHANGE THE DIRECTORY TO THE RIGHT NAME
+   WHEN WE SUBMIT *)
 let () =
   let target_directory = "3110-final-project" in
   try
