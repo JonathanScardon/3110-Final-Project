@@ -283,7 +283,9 @@ let charge_credit_card user card typ amount entity =
   with
   | CreditLimitReached ->
       print_string [ Foreground Red ]
-        "\nYou cannot spend money past your credit limit!\n"
+        "\n\
+         You cannot spend money past your credit limit! Please try again with \
+         another card, or pay this one off first.\n"
   | _ ->
       print_string [ Foreground Red ] "\nYou do not have a credit card yet.\n"
 
@@ -298,7 +300,9 @@ let rec make_transaction user =
       || not (Data.search2 "credit_card" card (user_financial_file user))
     then (
       print_string [ Foreground Red ]
-        "\nSorry, this credit card does not exist!\n";
+        "\n\
+         Sorry, this credit card does not exist! If you do not have a card, \
+         please add one.\n";
       make_transaction user)
     else (
       print_string [ Reset ]
