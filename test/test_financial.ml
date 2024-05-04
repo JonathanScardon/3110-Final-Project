@@ -18,8 +18,59 @@ let test1_modify_financial _ =
        [ [ "credit_card"; "card1"; "0." ] ]
        "credit_card")
 
+let test2_modify_financial _ =
+  assert_equal
+    [ [ "credit_card"; "card1"; "10." ]; [ "credit_card"; "card2"; "10." ] ]
+    (modify_financial "card1" "add" 10.
+       [ [ "credit_card"; "card1"; "0." ]; [ "credit_card"; "card2"; "10." ] ]
+       "credit_card")
+
+let test3_modify_financial _ =
+  assert_equal
+    [ [ "credit_card"; "card1"; "100." ]; [ "credit_card"; "card2"; "10." ] ]
+    (modify_financial "card1" "set" 100.
+       [ [ "credit_card"; "card1"; "10." ]; [ "credit_card"; "card2"; "10." ] ]
+       "credit_card")
+
+let test4_modify_financial _ =
+  assert_equal
+    [ [ "credit_card"; "card1"; "0." ]; [ "credit_card"; "card2"; "10." ] ]
+    (modify_financial "card1" "subtract" 10.
+       [ [ "credit_card"; "card1"; "10." ]; [ "credit_card"; "card2"; "10." ] ]
+       "credit_card")
+
+let test5_modify_financial _ =
+  assert_equal
+    [ [ "credit_card"; "card1"; "-10." ]; [ "credit_card"; "card2"; "10." ] ]
+    (modify_financial "card1" "subtract" 10.
+       [ [ "credit_card"; "card1"; "0." ]; [ "credit_card"; "card2"; "10." ] ]
+       "credit_card")
+
 let suite =
-  "Financial.ml" >::: [ "modify_financial" >:: test1_modify_financial ]
+  "Financial.ml"
+  >::: [
+         "modify_financial one-line add" >:: test1_modify_financial;
+         "modify_financial two cards add" >:: test2_modify_financial;
+         "modify_financial set" >:: test3_modify_financial;
+         "modify_financial subtract" >:: test4_modify_financial;
+         "modify_financial subtract (negative balance)"
+         >:: test5_modify_financial;
+         ( "modify_financial account and card have same name" >:: fun _ ->
+           assert_equal
+             [
+               [ "account"; "card1"; "10." ];
+               [ "credit_card"; "card1"; "20." ];
+               [ "credit_card"; "card2"; "10." ];
+             ]
+             (modify_financial "card1" "set" 20.
+                [
+                  [ "account"; "card2"; "10." ];
+                  [ "credit_card"; "card1"; "10." ];
+                  [ "credit_card"; "card2"; "10." ];
+                ]
+                "credit_card")
+             ~printer:string_of_list_list );
+       ]
 
 (* Cite ChatGPT for appropriate navigation to correct root bc otherwise
    it wouldn't work right weirdly. *)
@@ -44,3 +95,6 @@ let () =
   with
   | Failure msg -> Printf.printf "Error: %s\n" msg
   | Sys_error msg -> Printf.printf "System error: %s\n" msg
+
+let _ = run_test_tt_main suite
+let () = print_endline "financial tests succeeded"
