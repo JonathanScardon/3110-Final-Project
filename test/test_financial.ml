@@ -53,8 +53,37 @@ let suite =
          "modify_financial two cards add" >:: test2_modify_financial;
          "modify_financial set" >:: test3_modify_financial;
          "modify_financial subtract" >:: test4_modify_financial;
+         "modify_financial subtract negative" >:: test5_modify_financial;
+         ( "modify_financial two cards add (different order)" >:: fun _ ->
+           assert_equal
+             [
+               [ "credit_card"; "card1"; "0." ];
+               [ "credit_card"; "card2"; "20." ];
+             ]
+             (modify_financial "card2" "add" 10.
+                [
+                  [ "credit_card"; "card1"; "0." ];
+                  [ "credit_card"; "card2"; "10." ];
+                ]
+                "credit_card")
+             ~printer:string_of_list_list );
          "modify_financial subtract (negative balance)"
          >:: test5_modify_financial;
+         ( "modify_financial account and card entries" >:: fun _ ->
+           assert_equal
+             [
+               [ "account"; "acc"; "10." ];
+               [ "credit_card"; "card1"; "20." ];
+               [ "credit_card"; "card2"; "10." ];
+             ]
+             (modify_financial "card1" "set" 20.
+                [
+                  [ "account"; "acc"; "10." ];
+                  [ "credit_card"; "card1"; "10." ];
+                  [ "credit_card"; "card2"; "10." ];
+                ]
+                "credit_card")
+             ~printer:string_of_list_list );
          ( "modify_financial account and card have same name" >:: fun _ ->
            assert_equal
              [
@@ -64,7 +93,7 @@ let suite =
              ]
              (modify_financial "card1" "set" 20.
                 [
-                  [ "account"; "card2"; "10." ];
+                  [ "account"; "card1"; "10." ];
                   [ "credit_card"; "card1"; "10." ];
                   [ "credit_card"; "card2"; "10." ];
                 ]

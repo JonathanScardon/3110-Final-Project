@@ -83,8 +83,8 @@ let rec modify_financial name operation amount data aspect =
               [ aspect; name; string_of_float (float_of_string c -. amount) ]
               :: t
           | "set" -> [ aspect; name; string_of_float amount ] :: t
-          | _ -> modify_financial name operation amount t aspect)
-      | _ :: _ -> modify_financial name operation amount t aspect)
+          | _ -> h :: modify_financial name operation amount t aspect)
+      | _ :: _ -> h :: modify_financial name operation amount t aspect)
 
 let edit_account_balance user name operation amount =
   let data = load_financial_data user in
