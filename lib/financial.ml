@@ -74,15 +74,17 @@ let rec modify_financial name operation amount data aspect =
   | h :: (t : string list list) -> (
       match h with
       | [] -> modify_financial name operation amount t aspect
-      | a :: (b : string) :: (c : string) :: _ when a = aspect && b = name -> (
+      | a :: (b : string) :: (c : string) :: d when a = aspect && b = name -> (
           match operation with
           | "add" ->
-              [ aspect; name; string_of_float (float_of_string c +. amount) ]
+              ([ aspect; name; string_of_float (float_of_string c +. amount) ]
+              @ d)
               :: t
           | "subtract" ->
-              [ aspect; name; string_of_float (float_of_string c -. amount) ]
+              ([ aspect; name; string_of_float (float_of_string c -. amount) ]
+              @ d)
               :: t
-          | "set" -> [ aspect; name; string_of_float amount ] :: t
+          | "set" -> ([ aspect; name; string_of_float amount ] @ d) :: t
           | _ -> h :: modify_financial name operation amount t aspect)
       | _ :: _ -> h :: modify_financial name operation amount t aspect)
 

@@ -26,4 +26,10 @@ val modify_financial :
   string -> string -> float -> string list list -> string -> string list list
 (** [modify_financial name operation amount data aspect] modifies the nested 
 list [data] with the given operation, amount, account/card [name], and 
-[aspect] (accounts/credit cards). *)
+[aspect] (accounts/credit cards). If [name] does not exist, [data] is unchanged. *)
+
+val modify_credit_data : string -> float -> string list list -> string list list
+(** [modify_credit_data card amount data] adds [amount] to the debt of 
+[card] in [data]. Factoring in the user's current debt, if the amount
+  goes over the credit limit, the exception [CreditLimitReached] is raised.
+  If the [card] does not exist, [data] is unchanged. *)
