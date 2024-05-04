@@ -21,3 +21,9 @@ val remove_credit : string -> unit
 val view_transactions : string -> unit
 val make_transaction : string -> unit
 val prompt_pay_credit : string -> unit
+
+val modify_financial :
+  string -> string -> float -> string list list -> string -> string list list
+(** [modify_financial name operation amount data aspect] modifies the nested 
+list [data] with the given operation, amount, account/card [name], and 
+[aspect] (accounts/credit cards). *)
