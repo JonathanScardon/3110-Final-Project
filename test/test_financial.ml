@@ -1,4 +1,4 @@
-(* test modify_financial and modify_credit_data *)
+(* test modify_financial, modify_credit_data, remove_financial *)
 
 open OUnit2
 open Final_project.Financial
