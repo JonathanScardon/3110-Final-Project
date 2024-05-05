@@ -24,9 +24,8 @@ let save_user_stock_financials user_id data =
 
 let fetch_stock_data symbol =
   let url =
-    Printf.sprintf
-      "%s?function=TIME_SERIES_INTRADAY&symbol=%s&interval=5min&apikey=%s"
-      base_url symbol api_key
+    Printf.sprintf "%s?function=GLOBAL_QUOTE&symbol=%s&apikey=%s" base_url
+      symbol api_key
   in
   let response = ref "" in
   let c = Curl.init () in
@@ -37,29 +36,34 @@ let fetch_stock_data symbol =
   Curl.perform c;
   Curl.cleanup c;
   match Yojson.Basic.from_string !response with
-  | json -> Some json
+  | json -> (
+      try
+        let quote = json |> member "Global Quote" in
+        if Yojson.Basic.Util.to_option (fun x -> x) quote = None then None
+        else
+          let price = quote |> member "05. price" |> to_string in
+          Some price (* Ensure the price is a string here *)
+      with _ ->
+        None (* Handle cases where data might be missing or not a string *))
   | exception Yojson.Json_error _ -> None
 
 let update_stock_prices user_id =
   let stocks = load_user_stock_financials user_id in
   let updated_stocks =
     List.mapi
-      (fun i row ->
-        if i < 3 then
-          match row with
-          | symbol :: _ as stock -> (
-              match fetch_stock_data symbol with
-              | Some json ->
-                  let price =
-                    json
-                    |> member "Time Series (5min)"
-                    |> to_assoc |> List.hd |> snd |> member "4. close"
-                    |> to_string
-                  in
-                  List.append (List.tl stock) [ price ]
-              | None -> stock)
-          | _ -> row
-        else row)
+      (fun _ row ->
+        match row with
+        | symbol :: _ as stock -> (
+            match fetch_stock_data symbol with
+            | Some price ->
+                let new_stock_data = List.tl stock in
+                (* Remove the current price *)
+                List.append new_stock_data [ price ]
+                (* Add the new price *)
+            | None ->
+                stock (* Preserve the original data if no update is available *)
+            )
+        | _ -> row) (* Handle malformed rows *)
       stocks
   in
   save_user_stock_financials user_id updated_stocks

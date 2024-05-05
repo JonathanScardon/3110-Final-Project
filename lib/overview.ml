@@ -328,52 +328,52 @@ and manage_stock_options user =
 and stock_input user =
   let choice = read_line () in
   match choice with
-  | "1" ->
-      (* prompt_add_stock user; *)
-      manage_stock_options user
-  | "2" ->
-      (* prompt_remove_stock user; *)
-      manage_stock_options user
-  | "3" ->
-      (* prompt_modify_stock user; *)
-      manage_stock_options user
+  | "1" -> prompt_add_stock user
+  | "2" -> prompt_remove_stock user
+  | "3" -> prompt_modify_stock user
   | "4" ->
-      (* Financial.update_stock_prices user; *)
+      Financial_stock.update_stock_prices user;
       manage_stock_options user
   | "5" ->
-      (* Financial.view_stock_spread user; *)
+      Financial_stock.view_stock_spread user;
       manage_stock_options user
   | "6" -> financial_interface user
   | _ ->
       print_endline "Invalid option. Please try again.";
       manage_stock_options user
 
-(* and prompt_add_stock user =
-     let () = print_string [ Reset ] "Enter stock symbol: " in
-     let symbol = read_line () in
-     let () = print_string [ Reset ] "Enter number of shares: " in
-     let shares = read_line () in
-     let () = print_string [ Reset ] "Enter purchase price: " in
-     let price = read_line () in
-     Financial.add_stock user symbol (int_of_string shares) (float_of_string price)
+and prompt_add_stock user =
+  print_string [ Reset ] "Enter stock symbol: ";
+  let symbol = read_line () in
+  print_string [ Reset ] "Enter number of shares: ";
+  let shares = read_line () in
+  print_string [ Reset ] "Enter purchase price: ";
+  let price = read_line () in
+  Financial_stock.add_stock user symbol (int_of_string shares)
+    (float_of_string price);
+  print_string [ Foreground Green ] "Stock added successfully!\n";
+  manage_stock_options user
 
-   and prompt_remove_stock user =
-     let () = print_string [ Reset ] "Enter stock symbol to remove: " in
-     let symbol = read_line () in
-     Financial.remove_stock user symbol
+and prompt_remove_stock user =
+  print_string [ Reset ] "Enter stock symbol to remove: ";
+  let symbol = read_line () in
+  Financial_stock.remove_stock user symbol;
+  print_string [ Foreground Green ] "Stock removed successfully!\n";
+  manage_stock_options user
 
-   and prompt_modify_stock user =
-     let () = Financial.view_stock_spread user in
-     let () = print_string [ Reset ] "Enter stock index to modify: " in
-     let index = read_line () in
-     let () = print_string [ Reset ] "Enter new stock symbol: " in
-     let symbol = read_line () in
-     let () = print_string [ Reset ] "Enter new number of shares: " in
-     let shares = read_line () in
-     let () = print_string [ Reset ] "Enter new purchase price: " in
-     let price = read_line () in
-     let () = print_string [ Reset ] "Enter last known price: " in
-     let last_price = read_line () in
-     Financial.modify_stock user (int_of_string index) symbol
-       (int_of_string shares) (float_of_string price)
-       (float_of_string last_price) *)
+and prompt_modify_stock user =
+  Financial_stock.view_stock_spread user;
+  print_string [ Reset ] "Enter stock index to modify: ";
+  let index = int_of_string (read_line ()) in
+  print_string [ Reset ] "Enter new stock symbol: ";
+  let symbol = read_line () in
+  print_string [ Reset ] "Enter new number of shares: ";
+  let shares = int_of_string (read_line ()) in
+  print_string [ Reset ] "Enter new purchase price: ";
+  let purchase_price = float_of_string (read_line ()) in
+  print_string [ Reset ] "Enter last known price: ";
+  let last_price = float_of_string (read_line ()) in
+  Financial_stock.modify_stock user index symbol shares purchase_price
+    last_price;
+  print_string [ Foreground Green ] "Stock modified successfully!\n";
+  manage_stock_options user

@@ -1,3 +1,4 @@
-Symbol,Name,Shares Owned,Purchase Price,Current Price
-AAPL,Apple Inc,0,0,0
-GOOGL,Alphabet Inc,0,0,0
+Symbol,Shares,Purchase Price,Current Price
+AAPL,10,50.2,183.3800
+MSFT,20,150.5,280.3
+TSLA,5,600.0,880.2
