@@ -1,6 +1,5 @@
 (tests
  (names test_auth test_mood test_financial test_data)
- (flags :standard -w -32-33)
  (preprocess
   (pps bisect_ppx))
  (libraries ounit2 final_project bisect_ppx.runtime))
