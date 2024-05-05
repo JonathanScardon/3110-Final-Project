@@ -1,3 +1,5 @@
+exception CreditLimitReached
+
 val view_financial : string -> string -> unit
 
 val prompt_add_account : string -> unit

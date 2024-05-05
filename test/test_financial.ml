@@ -148,6 +148,20 @@ let suite =
              (modify_credit_data "card1" 2.
                 [ [ "credit_card"; "card1"; "10."; "0." ] ])
              ~printer:string_of_list_list );
+         ( "modify_credit_data zero" >:: fun _ ->
+           assert_equal
+             [ [ "credit_card"; "card1"; "10."; "10." ] ]
+             (modify_credit_data "card1" 10.
+                [ [ "credit_card"; "card1"; "10."; "0." ] ])
+             ~printer:string_of_list_list );
+         ( "modify_credit_data credit limit" >:: fun _ ->
+           assert_raises CreditLimitReached (fun () ->
+               modify_credit_data "card1" 2.
+                 [ [ "credit_card"; "card1"; "10."; "9." ] ]) );
+         ( "modify_credit_data credit limit 2" >:: fun _ ->
+           assert_raises CreditLimitReached (fun () ->
+               modify_credit_data "card1" 100.
+                 [ [ "credit_card"; "card1"; "10."; "0." ] ]) );
        ]
 
 (* Cite ChatGPT for appropriate navigation to correct root bc otherwise
