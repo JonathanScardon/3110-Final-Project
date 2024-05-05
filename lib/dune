@@ -1,6 +1,5 @@
 (library
  (name final_project)
- (flags :standard -w -32-33)
  (libraries
   csv
   cryptokit
