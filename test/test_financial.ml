@@ -1,15 +1,8 @@
 (* test modify_financial, modify_credit_data, remove_financial *)
 
 open OUnit2
+open Test
 open Final_project.Financial
-
-let rec string_of_list lst =
-  match lst with [] -> "-" | h :: t -> h ^ "|" ^ string_of_list t
-
-let rec string_of_list_list lst =
-  match lst with
-  | [] -> "[]"
-  | h :: t -> "[" ^ string_of_list h ^ "]; " ^ string_of_list_list t
 
 let test1_modify_financial _ =
   assert_equal
