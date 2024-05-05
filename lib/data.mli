@@ -26,11 +26,6 @@ val edit : string -> string -> string -> unit
     [data], contained within the CSV [path]. If the row does not exist, then it
      is appended to the end. *)
 
-val take : int -> 'a list -> 'a list
-(** [take n lst] returns the first [n] elements of [lst]. If [n] is greater 
-    than the length of [lst], it returns [lst]. If [n] is less than or equal to 
-    zero, it returns an empty list. *)
-
 val search_entry : string -> string -> unit
 (** [search_entry header path] prompts the user to enter a date in the format 
     day-month-year (e.g., 2-3-2024) to search for entries in the CSV file at 

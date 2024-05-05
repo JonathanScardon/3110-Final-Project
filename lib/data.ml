@@ -139,12 +139,3 @@ let rec remove_entry path =
     with Not_found ->
       print_string [ Foreground Red ] "Sorry, this entry does not exist!\n";
       remove_entry path
-
-let take n lst =
-  let rec aux n acc lst =
-    match lst with
-    | [] -> List.rev acc
-    | _ when n = 0 -> List.rev acc
-    | x :: xs -> aux (n - 1) (x :: acc) xs
-  in
-  aux n [] lst
