@@ -162,6 +162,96 @@ let suite =
            assert_raises CreditLimitReached (fun () ->
                modify_credit_data "card1" 100.
                  [ [ "credit_card"; "card1"; "10."; "0." ] ]) );
+         ( "remove_financial empty" >:: fun _ ->
+           assert_equal []
+             (remove_financial
+                [ [ "credit_card"; "card1"; "10."; "0." ] ]
+                "credit_card" "card1")
+             ~printer:string_of_list_list );
+         ( "remove_financial two cards, first" >:: fun _ ->
+           assert_equal
+             [ [ "credit_card"; "card2"; "10."; "0." ] ]
+             (remove_financial
+                [
+                  [ "credit_card"; "card1"; "10."; "0." ];
+                  [ "credit_card"; "card2"; "10."; "0." ];
+                ]
+                "credit_card" "card1")
+             ~printer:string_of_list_list );
+         ( "remove_financial two cards, second" >:: fun _ ->
+           assert_equal
+             [ [ "credit_card"; "card1"; "10."; "0." ] ]
+             (remove_financial
+                [
+                  [ "credit_card"; "card1"; "10."; "0." ];
+                  [ "credit_card"; "card2"; "10."; "0." ];
+                ]
+                "credit_card" "card2")
+             ~printer:string_of_list_list );
+         ( "remove_financial accounts and cards" >:: fun _ ->
+           assert_equal
+             [
+               [ "credit_card"; "card1"; "10."; "0." ];
+               [ "account"; "acc"; "10."; "0." ];
+             ]
+             (remove_financial
+                [
+                  [ "credit_card"; "card1"; "10."; "0." ];
+                  [ "credit_card"; "card2"; "10."; "0." ];
+                  [ "account"; "acc"; "10."; "0." ];
+                ]
+                "credit_card" "card2")
+             ~printer:string_of_list_list );
+         ( "remove_financial account end" >:: fun _ ->
+           assert_equal
+             [
+               [ "credit_card"; "card1"; "10."; "0." ];
+               [ "credit_card"; "card2"; "10."; "0." ];
+               [ "account"; "acc1"; "10."; "0." ];
+             ]
+             (remove_financial
+                [
+                  [ "credit_card"; "card1"; "10."; "0." ];
+                  [ "credit_card"; "card2"; "10."; "0." ];
+                  [ "account"; "acc1"; "10."; "0." ];
+                  [ "account"; "acc2"; "10."; "0." ];
+                ]
+                "account" "acc2")
+             ~printer:string_of_list_list );
+         ( "remove_financial account middle" >:: fun _ ->
+           assert_equal
+             [
+               [ "credit_card"; "card1"; "10."; "0." ];
+               [ "credit_card"; "card2"; "10."; "0." ];
+               [ "account"; "acc2"; "10."; "0." ];
+             ]
+             (remove_financial
+                [
+                  [ "credit_card"; "card1"; "10."; "0." ];
+                  [ "account"; "acc1"; "10."; "0." ];
+                  [ "credit_card"; "card2"; "10."; "0." ];
+                  [ "account"; "acc2"; "10."; "0." ];
+                ]
+                "account" "acc1")
+             ~printer:string_of_list_list );
+         ( "remove_financial account beginning" >:: fun _ ->
+           assert_equal
+             [
+               [ "credit_card"; "card1"; "10."; "0." ];
+               [ "account"; "acc1"; "10."; "0." ];
+               [ "credit_card"; "card2"; "10."; "0." ];
+               [ "account"; "acc2"; "10."; "0." ];
+             ]
+             (remove_financial
+                [
+                  [ "account"; "acc3"; "10."; "0." ];
+                  [ "credit_card"; "card1"; "10."; "0." ];
+                  [ "account"; "acc1"; "10."; "0." ];
+                  [ "credit_card"; "card2"; "10."; "0." ];
+                  [ "account"; "acc2"; "10."; "0." ];
+                ]
+                "account" "acc3")
+             ~printer:string_of_list_list );
        ]
 
 (* Cite ChatGPT for appropriate navigation to correct root bc otherwise
@@ -188,5 +278,4 @@ let () =
   | Failure msg -> Printf.printf "Error: %s\n" msg
   | Sys_error msg -> Printf.printf "System error: %s\n" msg
 
-let _ = run_test_tt_main suite
 let () = print_endline "financial tests succeeded"

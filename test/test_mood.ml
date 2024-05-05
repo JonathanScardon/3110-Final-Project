@@ -70,5 +70,4 @@ let () =
   | Failure msg -> Printf.printf "Error: %s\n" msg
   | Sys_error msg -> Printf.printf "System error: %s\n" msg
 
-let _ = run_test_tt_main suite
 let () = print_endline "mood tests succeeded"

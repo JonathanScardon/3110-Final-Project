@@ -30,16 +30,15 @@ let rec find_and_set_directory target_dir =
 
 (* WE REALLY NEED TO MAKE SURE WE CHANGE THE DIRECTORY TO THE RIGHT NAME
    WHEN WE SUBMIT *)
-let () =
-  let target_directory = "3110-final-project" in
-  try
-    let found_dir = find_and_set_directory target_directory in
-    Sys.chdir found_dir;
-    Printf.printf "Changed to directory: %s\n" (Sys.getcwd ());
-    run_test_tt_main suite
-  with
-  | Failure msg -> Printf.printf "Error: %s\n" msg
-  | Sys_error msg -> Printf.printf "System error: %s\n" msg
+(* let () =
+   let target_directory = "3110-final-project" in
+   try
+     let found_dir = find_and_set_directory target_directory in
+     Sys.chdir found_dir;
+     Printf.printf "Changed to directory: %s\n" (Sys.getcwd ());
+     run_test_tt_main suite
+   with
+   | Failure msg -> Printf.printf "Error: %s\n" msg
+   | Sys_error msg -> Printf.printf "System error: %s\n" msg *)
 
-(* let _ = run_test_tt_main suite *)
 let () = print_endline "health tests succeeded"

@@ -35,3 +35,7 @@ val modify_credit_data : string -> float -> string list list -> string list list
 [card] in [data]. Factoring in the user's current debt, if the amount
   goes over the credit limit, the exception [CreditLimitReached] is raised.
   If the [card] does not exist, [data] is unchanged. *)
+
+val remove_financial : 'a list list -> 'a -> 'a -> 'a list list
+(** [remove_financial lst aspect name] removes the account or credit card,
+    specified by [aspect], with name [name] from [lst]. *)
