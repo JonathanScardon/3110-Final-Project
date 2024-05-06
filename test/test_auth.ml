@@ -37,10 +37,6 @@ let test_empty_username_and_password _ =
   assert_equal false (authenticate "" "" 1)
     ~msg:"Should fail authentication with empty username and password"
 
-let test_empty_username_and_password _ =
-  assert_equal false (authenticate "" "" 1)
-    ~msg:"Should fail authentication with empty username and password"
-
 let test_valid_username_incorrect_password _ =
   assert_equal false
     (authenticate "test" "wrongpassword" 1)

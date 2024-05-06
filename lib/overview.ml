@@ -328,14 +328,24 @@ and manage_stock_options user =
 and stock_input user =
   let choice = read_line () in
   match choice with
-  | "1" -> prompt_add_stock user
-  | "2" -> prompt_remove_stock user
-  | "3" -> prompt_modify_stock user
+  | "1" ->
+      prompt_add_stock user;
+      Financial_stock.display_stocks ("data/" ^ user ^ "_stock_financials.csv");
+      manage_stock_options user
+  | "2" ->
+      prompt_remove_stock user;
+      Financial_stock.display_stocks ("data/" ^ user ^ "_stock_financials.csv");
+      manage_stock_options user
+  | "3" ->
+      prompt_modify_stock user;
+      Financial_stock.display_stocks ("data/" ^ user ^ "_stock_financials.csv");
+      manage_stock_options user
   | "4" ->
       Financial_stock.update_stock_prices user;
+      Financial_stock.display_stocks ("data/" ^ user ^ "_stock_financials.csv");
       manage_stock_options user
   | "5" ->
-      Financial_stock.view_stock_spread user;
+      Financial_stock.display_stocks ("data/" ^ user ^ "_stock_financials.csv");
       manage_stock_options user
   | "6" -> financial_interface user
   | _ ->

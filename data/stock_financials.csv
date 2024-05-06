@@ -1,4 +1,4 @@
-Symbol,Shares,Purchase Price,Current Price
-AAPL,10,50.2,183.3800
-MSFT,20,150.5,280.3
-TSLA,5,600.0,880.2
+Symbol,Shares,Purchase Price,Current Price,Percent Change
+AAPL,10,50.2,183.3800,0.0
+MSFT,20,150.5,280.3,0.0
+TSLA,5,600.0,880,0.0
