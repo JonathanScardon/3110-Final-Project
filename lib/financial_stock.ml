@@ -36,45 +36,45 @@ let fetch_stock_data symbol =
       with _ -> None)
   | exception Yojson.Json_error _ -> None
 
-(* let update_stock_prices user_id =
-   let stocks = load_user_stock_financials user_id in
-   let updated_stocks =
-     List.map
-       (fun row ->
-         match row with
-         | [ symbol; shares; purchase_price; _ ] -> (
-             match fetch_stock_data symbol with
-             | Some price -> [ symbol; shares; purchase_price; price ]
-             | None -> row)
-         | _ -> row)
-       stocks
-   in
-   save_user_stock_financials user_id updated_stocks *)
-
 let update_stock_prices user_id =
   let stocks = load_user_stock_financials user_id in
   let updated_stocks =
     List.map
       (fun row ->
         match row with
-        | [ symbol; shares; purchase_price; last_price ] -> (
-            Printf.printf "Updating price for %s\n" symbol;
-            (* Debug information *)
+        | [ symbol; shares; purchase_price; _ ] -> (
             match fetch_stock_data symbol with
-            | Some price ->
-                Printf.printf "New price for %s is %s\n" symbol price;
-                [ symbol; shares; purchase_price; price ]
-            | None ->
-                Printf.printf
-                  "Failed to fetch new price for %s, keeping last known price %s\n"
-                  symbol last_price;
-                [ symbol; shares; purchase_price; last_price ])
-        | _ ->
-            Printf.printf "Skipping malformed row\n";
-            row)
+            | Some price -> [ symbol; shares; purchase_price; price ]
+            | None -> row)
+        | _ -> row)
       stocks
   in
   save_user_stock_financials user_id updated_stocks
+
+(* let update_stock_prices user_id =
+   let stocks = load_user_stock_financials user_id in
+   let updated_stocks =
+     List.map
+       (fun row ->
+         match row with
+         | [ symbol; shares; purchase_price; last_price ] -> (
+             Printf.printf "Updating price for %s\n" symbol;
+             (* Debug information *)
+             match fetch_stock_data symbol with
+             | Some price ->
+                 Printf.printf "New price for %s is %s\n" symbol price;
+                 [ symbol; shares; purchase_price; price ]
+             | None ->
+                 Printf.printf
+                   "Failed to fetch new price for %s, keeping last known price %s\n"
+                   symbol last_price;
+                 [ symbol; shares; purchase_price; last_price ])
+         | _ ->
+             Printf.printf "Skipping malformed row\n";
+             row)
+       stocks
+   in
+   save_user_stock_financials user_id updated_stocks *)
 
 let calculate_portfolio_value user_id =
   let stocks = load_user_stock_financials user_id in
@@ -105,32 +105,26 @@ let remove_stock user_id symbol =
   let filtered_stocks = List.filter (fun row -> List.hd row <> symbol) stocks in
   save_user_stock_financials user_id filtered_stocks
 
-let modify_stock user_id index symbol shares purchase_price last_price =
-  try
-    let index = index - 1 in
-    let stocks = load_user_stock_financials user_id in
-    if index < 0 || index >= List.length stocks then
-      Printf.printf "Invalid index. Please enter a valid stock index.\n"
-    else
-      let new_stocks =
-        List.mapi
-          (fun i row ->
-            if i = index then (
-              Printf.printf "Modifying stock: %s\n" (List.nth row 0);
-              [
-                symbol;
-                string_of_int shares;
-                Printf.sprintf "%.2f" purchase_price;
-                Printf.sprintf "%.2f" last_price;
-              ])
-            else row)
-          stocks
-      in
-      save_user_stock_financials user_id new_stocks;
-      Printf.printf "Stock modified successfully.\n"
-  with
-  | Failure err -> Printf.printf "Error modifying stock: %s\n" err
-  | ex -> Printf.printf "Unexpected error: %s\n" (Printexc.to_string ex)
+let modify_stock user_id symbol shares purchase_price last_price =
+  let stocks = load_user_stock_financials user_id in
+  let new_stocks =
+    List.map
+      (fun row ->
+        match row with
+        | existing_symbol :: _ when existing_symbol = symbol ->
+            [
+              symbol;
+              string_of_int shares;
+              Printf.sprintf "%.2f" purchase_price;
+              Printf.sprintf "%.2f" last_price;
+            ]
+        | _ -> row)
+      stocks
+  in
+  save_user_stock_financials user_id new_stocks;
+  if List.exists (fun row -> List.hd row = symbol) new_stocks then
+    Printf.printf "\n"
+  else Printf.printf "Stock symbol not found.\n"
 
 let view_stock_spread user =
   let stocks = load_user_stock_financials user in

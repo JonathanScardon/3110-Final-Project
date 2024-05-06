@@ -2,12 +2,38 @@
 open Data
 open ANSITerminal
 
-(* open Lwt *)
-(* open Financial
-   open Financial_stock *)
-
 let print_strings style lines =
   List.iter (fun line -> print_string style line) lines
+
+let rec get_valid_int prompt error_msg =
+  print_string [ Reset ] prompt;
+  match read_line () with
+  | "back" -> None
+  | input -> (
+      try Some (int_of_string input)
+      with Failure _ ->
+        print_endline error_msg;
+        get_valid_int prompt error_msg)
+
+let rec get_valid_float prompt error_msg =
+  print_string [ Reset ] prompt;
+  match read_line () with
+  | "back" -> None
+  | input -> (
+      try Some (float_of_string input)
+      with Failure _ ->
+        print_endline error_msg;
+        get_valid_float prompt error_msg)
+
+let rec get_valid_string prompt error_msg =
+  print_string [ Reset ] prompt;
+  let input = read_line () in
+  if input = "" || input = "back" then
+    if input = "back" then None (* If user types 'back', return None *)
+    else (
+      print_endline error_msg;
+      get_valid_string prompt error_msg)
+  else Some input (* Return input wrapped in Some if it's valid *)
 
 (* mood interface *)
 
@@ -353,37 +379,70 @@ and stock_input user =
       manage_stock_options user
 
 and prompt_add_stock user =
-  print_string [ Reset ] "Enter stock symbol: ";
-  let symbol = read_line () in
-  print_string [ Reset ] "Enter number of shares: ";
-  let shares = read_line () in
-  print_string [ Reset ] "Enter purchase price: ";
-  let price = read_line () in
-  Financial_stock.add_stock user symbol (int_of_string shares)
-    (float_of_string price);
-  print_string [ Foreground Green ] "Stock added successfully!\n";
-  manage_stock_options user
+  match
+    get_valid_string "Enter stock symbol or type 'back' to return: "
+      "Please enter a valid symbol or type 'back' to return."
+  with
+  | None -> manage_stock_options user
+  | Some symbol -> (
+      match
+        get_valid_int "Enter number of shares: "
+          "Please enter a valid integer number of shares."
+      with
+      | None -> manage_stock_options user
+      | Some shares -> (
+          match
+            get_valid_float
+              "Enter purchase price (use a decimal point for cents): "
+              "Please enter a valid price."
+          with
+          | None -> manage_stock_options user
+          | Some price ->
+              Financial_stock.add_stock user symbol shares price;
+              print_string [ Foreground Green ] "Stock added successfully!\n";
+              manage_stock_options user))
 
 and prompt_remove_stock user =
-  print_string [ Reset ] "Enter stock symbol to remove: ";
-  let symbol = read_line () in
-  Financial_stock.remove_stock user symbol;
-  print_string [ Foreground Green ] "Stock removed successfully!\n";
-  manage_stock_options user
+  match
+    get_valid_string "Enter stock symbol to remove or type 'back' to return: "
+      "Please enter a valid symbol or type 'back' to return."
+  with
+  | None -> manage_stock_options user
+  | Some symbol ->
+      Financial_stock.remove_stock user symbol;
+      print_string [ Foreground Green ] "Stock removed successfully!\n";
+      manage_stock_options user
 
 and prompt_modify_stock user =
   Financial_stock.view_stock_spread user;
-  print_string [ Reset ] "Enter stock index to modify: ";
-  let index = int_of_string (read_line ()) in
-  print_string [ Reset ] "Enter new stock symbol: ";
-  let symbol = read_line () in
-  print_string [ Reset ] "Enter new number of shares: ";
-  let shares = int_of_string (read_line ()) in
-  print_string [ Reset ] "Enter new purchase price: ";
-  let purchase_price = float_of_string (read_line ()) in
-  print_string [ Reset ] "Enter last known price: ";
-  let last_price = float_of_string (read_line ()) in
-  Financial_stock.modify_stock user index symbol shares purchase_price
-    last_price;
-  print_string [ Foreground Green ] "Stock modified successfully!\n";
-  manage_stock_options user
+  match
+    get_valid_string "Enter stock symbol to modify or type 'back' to return: "
+      "Please enter a valid symbol."
+  with
+  | Some symbol when symbol <> "back" -> (
+      match
+        get_valid_int "Enter new number of shares: "
+          "Please enter a valid integer number of shares."
+      with
+      | Some shares -> (
+          match
+            get_valid_float
+              "Enter new purchase price (use a decimal point for cents): "
+              "Please enter a valid price."
+          with
+          | Some purchase_price -> (
+              match
+                get_valid_float
+                  "Enter last known price (use a decimal point for cents): "
+                  "Please enter a valid price."
+              with
+              | Some last_price ->
+                  Financial_stock.modify_stock user symbol shares purchase_price
+                    last_price;
+                  print_string [ Foreground Green ]
+                    "Stock modified successfully!\n";
+                  manage_stock_options user
+              | None -> manage_stock_options user)
+          | None -> manage_stock_options user)
+      | None -> manage_stock_options user)
+  | _ -> manage_stock_options user
