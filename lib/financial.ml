@@ -240,17 +240,21 @@ let pay_credit_card_balance user credit_name account_name amount =
   | [ [ "credit_card"; _; _; balance ] ], [ [ "account"; _; account_balance ] ]
     ->
       let balance = float_of_string balance in
-      let account_balance = float_of_string account_balance in
-      let pay_amount = min balance (min amount account_balance) in
-      if pay_amount > 0.0 && account_balance >= amount then (
-        let new_credit_balance = balance -. pay_amount in
-        let new_account_balance = account_balance -. pay_amount in
-        edit_account_balance user account_name "subtract" new_account_balance;
-        edit_credit_balance user account_name "subtract" new_credit_balance;
-        print_string [ Foreground Green ] "\nPayment successful.\n")
-      else
+      if balance = 0. then
         print_string [ Foreground Red ]
-          "\nInvalid payment amount or insufficient funds.\n"
+          "\nYou do not have a balance to pay off!\n"
+      else
+        let account_balance = float_of_string account_balance in
+        let pay_amount = min balance (min amount account_balance) in
+        if pay_amount > 0.0 && account_balance >= amount then (
+          let new_credit_balance = balance -. pay_amount in
+          let new_account_balance = account_balance -. pay_amount in
+          edit_account_balance user account_name "subtract" new_account_balance;
+          edit_credit_balance user account_name "subtract" new_credit_balance;
+          print_string [ Foreground Green ] "\nPayment successful.\n")
+        else
+          print_string [ Foreground Red ]
+            "\nInvalid payment amount or insufficient funds.\n"
   | _ -> print_string [ Foreground Red ] "\nCredit card or account not found.\n"
 
 let rec prompt_pay_credit user =

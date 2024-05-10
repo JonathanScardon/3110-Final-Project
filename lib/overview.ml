@@ -379,61 +379,61 @@ and stock_input user =
 
 and prompt_add_stock user =
   match
-    get_valid_string "Enter stock symbol or type 'back' to return: "
-      "Please enter a valid symbol or type 'back' to return."
+    get_valid_string "\nEnter stock symbol or type 'back' to return: "
+      "\nPlease enter a valid symbol or type 'back' to return."
   with
   | None -> manage_stock_options user
   | Some symbol -> (
       match
-        get_valid_int "Enter number of shares: "
-          "Please enter a valid integer number of shares."
+        get_valid_int "\nEnter number of shares: "
+          "\nPlease enter a valid integer number of shares."
       with
       | None -> manage_stock_options user
       | Some shares -> (
           match
             get_valid_float
-              "Enter purchase price (use a decimal point for cents): "
-              "Please enter a valid price."
+              "\nEnter purchase price (use a decimal point for cents): "
+              "\nPlease enter a valid price."
           with
           | None -> manage_stock_options user
           | Some price ->
               Financial_stock.add_stock user symbol shares price;
-              print_string [ Foreground Green ] "Stock added successfully!\n";
+              print_string [ Foreground Green ] "\nStock added successfully!\n";
               manage_stock_options user))
 
 and prompt_remove_stock user =
   match
-    get_valid_string "Enter stock symbol to remove or type 'back' to return: "
-      "Please enter a valid symbol or type 'back' to return."
+    get_valid_string "\nEnter stock symbol to remove or type 'back' to return: "
+      "\nPlease enter a valid symbol or type 'back' to return."
   with
   | None -> manage_stock_options user
   | Some symbol ->
       Financial_stock.remove_stock user symbol;
-      print_string [ Foreground Green ] "Stock removed successfully!\n";
+      print_string [ Foreground Green ] "\nStock removed successfully!\n";
       manage_stock_options user
 
 and prompt_modify_stock user =
   Financial_stock.view_stock_spread user;
   match
-    get_valid_string "Enter stock symbol to modify or type 'back' to return: "
-      "Please enter a valid symbol."
+    get_valid_string "\nEnter stock symbol to modify or type 'back' to return: "
+      "\nPlease enter a valid symbol."
   with
   | Some symbol when symbol <> "back" -> (
       match
-        get_valid_int "Enter new number of shares: "
-          "Please enter a valid integer number of shares."
+        get_valid_int "\nEnter new number of shares: "
+          "\nPlease enter a valid integer number of shares."
       with
       | Some shares -> (
           match
             get_valid_float
-              "Enter new purchase price (use a decimal point for cents): "
-              "Please enter a valid price."
+              "\nEnter new purchase price (use a decimal point for cents): "
+              "\nPlease enter a valid price."
           with
           | Some purchase_price -> (
               match
                 get_valid_float
-                  "Enter last known price (use a decimal point for cents): "
-                  "Please enter a valid price."
+                  "\nEnter last known price (use a decimal point for cents): "
+                  "\nPlease enter a valid price."
               with
               | Some last_price ->
                   Financial_stock.modify_stock user symbol shares purchase_price
