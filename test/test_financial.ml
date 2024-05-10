@@ -6,7 +6,7 @@ open Final_project.Financial
 
 let test1_modify_financial _ =
   assert_equal
-    [ [ "credit_card"; "card1"; "10."; "0." ] ]
+    [ [ "credit_card"; "card1"; "0."; "10." ] ]
     (modify_financial "card1" "add" 10.
        [ [ "credit_card"; "card1"; "0."; "0." ] ]
        "credit_card")
@@ -14,7 +14,7 @@ let test1_modify_financial _ =
 let test2_modify_financial _ =
   assert_equal
     [
-      [ "credit_card"; "card1"; "10."; "0." ];
+      [ "credit_card"; "card1"; "0."; "10." ];
       [ "credit_card"; "card2"; "10."; "0." ];
     ]
     (modify_financial "card1" "add" 10.
@@ -27,7 +27,7 @@ let test2_modify_financial _ =
 let test3_modify_financial _ =
   assert_equal
     [
-      [ "credit_card"; "card1"; "100."; "0." ];
+      [ "credit_card"; "card1"; "10."; "100." ];
       [ "credit_card"; "card2"; "10."; "0." ];
     ]
     (modify_financial "card1" "set" 100.
@@ -40,12 +40,12 @@ let test3_modify_financial _ =
 let test4_modify_financial _ =
   assert_equal
     [
-      [ "credit_card"; "card1"; "0."; "0." ];
+      [ "credit_card"; "card1"; "10."; "0." ];
       [ "credit_card"; "card2"; "10."; "0." ];
     ]
     (modify_financial "card1" "subtract" 10.
        [
-         [ "credit_card"; "card1"; "10."; "0." ];
+         [ "credit_card"; "card1"; "10."; "10." ];
          [ "credit_card"; "card2"; "10."; "0." ];
        ]
        "credit_card")
@@ -53,7 +53,7 @@ let test4_modify_financial _ =
 let test5_modify_financial _ =
   assert_equal
     [
-      [ "credit_card"; "card1"; "-10."; "0." ];
+      [ "credit_card"; "card1"; "0."; "-10." ];
       [ "credit_card"; "card2"; "10."; "0." ];
     ]
     (modify_financial "card1" "subtract" 10.
@@ -75,12 +75,12 @@ let suite =
            assert_equal
              [
                [ "credit_card"; "card1"; "0."; "0." ];
-               [ "credit_card"; "card2"; "20."; "0." ];
+               [ "credit_card"; "card2"; "10."; "20." ];
              ]
              (modify_financial "card2" "add" 10.
                 [
                   [ "credit_card"; "card1"; "0."; "0." ];
-                  [ "credit_card"; "card2"; "10."; "0." ];
+                  [ "credit_card"; "card2"; "10."; "10." ];
                 ]
                 "credit_card")
              ~printer:string_of_list_list );
@@ -90,7 +90,7 @@ let suite =
            assert_equal
              [
                [ "account"; "acc"; "10." ];
-               [ "credit_card"; "card1"; "20."; "0." ];
+               [ "credit_card"; "card1"; "10."; "20." ];
                [ "credit_card"; "card2"; "10."; "0." ];
              ]
              (modify_financial "card1" "set" 20.
@@ -105,7 +105,7 @@ let suite =
            assert_equal
              [
                [ "account"; "card1"; "10." ];
-               [ "credit_card"; "card1"; "20."; "0." ];
+               [ "credit_card"; "card1"; "10."; "20." ];
                [ "credit_card"; "card2"; "10."; "0." ];
              ]
              (modify_financial "card1" "set" 20.

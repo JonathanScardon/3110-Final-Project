@@ -75,7 +75,7 @@ let rec modify_financial name operation amount data aspect =
   | h :: (t : string list list) -> (
       match h with
       | [] -> modify_financial name operation amount t aspect
-      | a :: (b : string) :: (c : string) :: d when a = aspect && b = name -> (
+      | a :: b :: c :: d when aspect = "account" && a = aspect && b = name -> (
           match operation with
           | "add" ->
               ([ aspect; name; string_of_float (float_of_string c +. amount) ]
@@ -86,6 +86,23 @@ let rec modify_financial name operation amount data aspect =
               @ d)
               :: t
           | "set" -> ([ aspect; name; string_of_float amount ] @ d) :: t
+          | _ -> h :: modify_financial name operation amount t aspect)
+      | a :: b :: l :: c :: d
+        when aspect = "credit_card" && a = aspect && b = name -> (
+          match operation with
+          | "add" ->
+              ([
+                 aspect; name; l; string_of_float (float_of_string c +. amount);
+               ]
+              @ d)
+              :: t
+          | "subtract" ->
+              ([
+                 aspect; name; l; string_of_float (float_of_string c -. amount);
+               ]
+              @ d)
+              :: t
+          | "set" -> ([ aspect; name; l; string_of_float amount ] @ d) :: t
           | _ -> h :: modify_financial name operation amount t aspect)
       | _ :: _ -> h :: modify_financial name operation amount t aspect)
 
@@ -241,18 +258,21 @@ let pay_credit_card_balance user credit_name account_name amount =
   match (credit_card, account) with
   | [ [ "credit_card"; _; _; balance ] ], [ [ "account"; _; account_balance ] ]
     ->
+      let str_balance = balance in
       let balance = float_of_string balance in
       if balance = 0. then
         print_string [ Foreground Red ]
           "\nYou do not have a balance to pay off!\n"
+      else if amount > balance then
+        print_string [ Foreground Red ]
+          ("\nYou are paying too much! Please pay " ^ str_balance
+         ^ " or less.\n")
       else
         let account_balance = float_of_string account_balance in
         let pay_amount = min balance (min amount account_balance) in
         if pay_amount > 0.0 && account_balance >= amount then (
-          let new_credit_balance = balance -. pay_amount in
-          let new_account_balance = account_balance -. pay_amount in
-          edit_account_balance user account_name "subtract" new_account_balance;
-          edit_credit_balance user account_name "subtract" new_credit_balance;
+          edit_account_balance user account_name "subtract" pay_amount;
+          edit_credit_balance user credit_name "subtract" pay_amount;
           print_string [ Foreground Green ] "\nPayment successful.\n")
         else
           print_string [ Foreground Red ]
