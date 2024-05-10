@@ -1,4 +1,4 @@
-(* test modify_financial, modify_credit_data, remove_financial *)
+(* modify_financial, modify_credit_data, remove_financial, string_financial *)
 
 open OUnit2
 open Test
@@ -245,6 +245,68 @@ let suite =
                 ]
                 "account" "acc3")
              ~printer:string_of_list_list );
+         ( "string_financial simple account" >:: fun _ ->
+           assert_equal "acc3 10.\n"
+             (string_financial [ [ "account"; "acc3"; "10." ] ] "account")
+             ~printer:(fun x -> x) );
+         ( "string_financial simple credit_card" >:: fun _ ->
+           assert_equal "card1 10. 0.\n"
+             (string_financial
+                [ [ "credit_card"; "card1"; "10."; "0." ] ]
+                "credit_card")
+             ~printer:(fun x -> x) );
+         ( "string_financial no accounts" >:: fun _ ->
+           assert_equal "\n"
+             (string_financial
+                [ [ "credit_card"; "card1"; "10."; "0." ] ]
+                "account")
+             ~printer:(fun x -> x) );
+         ( "string_financial no credit cards" >:: fun _ ->
+           assert_equal "\n"
+             (string_financial [ [ "account"; "acc"; "10." ] ] "credit_card")
+             ~printer:(fun x -> x) );
+         ( "string_financial credit card and account" >:: fun _ ->
+           assert_equal "card1 10. 0.\n"
+             (string_financial
+                [
+                  [ "account"; "acc3"; "10." ];
+                  [ "credit_card"; "card1"; "10."; "0." ];
+                ]
+                "credit_card")
+             ~printer:(fun x -> x) );
+         ( "string_financial credit card and account" >:: fun _ ->
+           assert_equal "acc3 10.\n"
+             (string_financial
+                [
+                  [ "account"; "acc3"; "10." ];
+                  [ "credit_card"; "card1"; "10."; "0." ];
+                ]
+                "account")
+             ~printer:(fun x -> x) );
+         ( "string_financial multiple credit cards, accounts" >:: fun _ ->
+           assert_equal "acc3 10.\nacc1 10.\nacc2 20.\n"
+             (string_financial
+                [
+                  [ "account"; "acc3"; "10." ];
+                  [ "credit_card"; "card1"; "10."; "0." ];
+                  [ "account"; "acc1"; "10." ];
+                  [ "credit_card"; "card2"; "10."; "0." ];
+                  [ "account"; "acc2"; "20." ];
+                ]
+                "account")
+             ~printer:(fun x -> x) );
+         ( "string_financial multiple credit cards, accounts" >:: fun _ ->
+           assert_equal "card1 10. 0.\ncard2 10. 5.\n"
+             (string_financial
+                [
+                  [ "account"; "acc3"; "10." ];
+                  [ "credit_card"; "card1"; "10."; "0." ];
+                  [ "account"; "acc1"; "10." ];
+                  [ "credit_card"; "card2"; "10."; "5." ];
+                  [ "account"; "acc2"; "20." ];
+                ]
+                "credit_card")
+             ~printer:(fun x -> x) );
        ]
 
 let _ = run_test_tt_main suite

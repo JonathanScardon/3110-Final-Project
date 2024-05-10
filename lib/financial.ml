@@ -22,6 +22,18 @@ let save_financial_data user data =
 
 (* accounts *)
 
+let string_financial sheet aspect =
+  List.fold_right
+    (fun lst acc ->
+      match lst with
+      | [] -> acc
+      | h :: t when h = aspect ->
+          if acc <> "" then String.concat " " t ^ "\n" ^ acc
+          else String.concat " " t
+      | _ :: _ -> acc)
+    sheet ""
+  ^ "\n"
+
 let view_financial user aspect =
   let sheet = Csv.load (user_financial_file user) in
   let header =
@@ -29,17 +41,7 @@ let view_financial user aspect =
     else "\nName | Limit | Debt"
   in
   print_endline header;
-  print_endline
-    (List.fold_right
-       (fun lst acc ->
-         match lst with
-         | [] -> ""
-         | h :: t when h = aspect ->
-             if acc <> "" then String.concat " " t ^ "\n" ^ acc
-             else String.concat " " t
-         | _ :: _ -> "")
-       sheet ""
-    ^ "\n")
+  print_endline (string_financial sheet aspect)
 
 let add_account user name balance =
   let data = load_financial_data user in

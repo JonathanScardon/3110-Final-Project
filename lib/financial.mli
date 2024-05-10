@@ -39,3 +39,7 @@ val modify_credit_data : string -> float -> string list list -> string list list
 val remove_financial : 'a list list -> 'a -> 'a -> 'a list list
 (** [remove_financial lst aspect name] removes the account or credit card,
     specified by [aspect], with name [name] from [lst]. *)
+
+val string_financial : string list list -> string -> string
+(** [string_financial sheet aspect] is a string representation of the 
+    [aspect] data (accounts or credit cards) in [sheet]. *)
