@@ -17,20 +17,20 @@ let hash_password password =
 
 let add_user username hashed_password =
   try
-    if username_exists username then (
-      print_string [ Foreground Red ]
-        (Printf.sprintf "Username %s already exists.\n" username);
-      false)
+    if username_exists username then
+      (* print_string [ Foreground Red ]
+         (Printf.sprintf "Username %s already exists.\n" username); *)
+      false
     else
       let credentials = Csv.load (credentials_path 0) in
       Csv.save (credentials_path 0)
         (credentials @ [ [ username; hashed_password ] ]);
       let create_user_file file data =
-        try
-          Csv.save file data;
-          print_string [ Foreground Green ]
-            (Printf.sprintf "File created: %s\n" file)
-        with Sys_error msg ->
+        try Csv.save file data
+        with
+        (* print_string [ Foreground Green ]
+           (Printf.sprintf "File created: %s\n" file) *)
+        | Sys_error msg ->
           print_string [ Foreground Red ]
             (Printf.sprintf "Failed to create file %s: %s\n" file msg)
       in
