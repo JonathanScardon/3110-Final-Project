@@ -66,7 +66,7 @@ and delete () =
         Sys.remove ("data/" ^ username ^ "_financials.csv");
         Sys.remove ("data/" ^ username ^ "_stock_financials.csv");
         Sys.remove ("data/" ^ username ^ "_transaction_log.csv");
-        print_endline "Account removed successfully.";
+        print_string [ Foreground Green ] "\nAccount removed successfully.";
         print_menu ();
         process_choice ()
       with Not_found ->
@@ -109,7 +109,7 @@ and login_failure () =
   login ()
 
 and registration_success () =
-  print_string [ Foreground Green ] "Registration successful!\n";
+  print_string [ Foreground Green ] "\nRegistration successful!\n";
   prompt_for_acknowledgment "Redirecting to login\n";
   login ()
 
