@@ -197,8 +197,7 @@ and process_choice user =
   | "1" -> mood_interface user
   | "2" -> health_interface user
   | "3" -> financial_interface user
-  | "4" -> ()
-  | "5" ->
+  | "4" ->
       print_endline "Exiting...";
       exit 0
   | _ -> dashboard_login user
@@ -211,10 +210,10 @@ and dashboard_login user =
       "1. Mood Tracker\n";
       "2. Health Tracker\n";
       "3. Finances Tracker\n";
-      "4. Goal Tracker\n";
-      "5. Exit\n";
+      (* "4. Goal Tracker\n"; *)
+      "4. Exit\n";
     ];
-  print_string [ Bold ] "Please choose an option (1-5): ";
+  print_string [ Bold ] "Please choose an option (1-4): ";
   process_choice user
 
 (* financial interface *)
