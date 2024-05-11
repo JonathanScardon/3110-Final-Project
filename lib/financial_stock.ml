@@ -1,4 +1,5 @@
 open Yojson.Basic.Util
+open ANSITerminal
 
 (* stock tracker *)
 let api_key = "64ROAIJNDDZD98UE"
@@ -11,6 +12,28 @@ let load_user_stock_financials user_id =
 let save_user_stock_financials user_id data =
   let path = "data/" ^ user_id ^ "_stock_financials.csv" in
   Csv.save path data
+
+let display_stocks path =
+  let csv_content = Csv.load path in
+  match csv_content with
+  | [] -> print_endline "No data available."
+  | _ :: data_rows ->
+      Printf.printf
+        "Symbol\tShares\tPurchase Price\tCurrent Price\tPercent Change\n";
+      List.iter
+        (fun row ->
+          match row with
+          | [ symbol; shares; purchase_price; current_price; percent_change ] ->
+              let color =
+                if float_of_string percent_change >= 0.0 then ANSITerminal.green
+                else ANSITerminal.red
+              in
+              ANSITerminal.print_string
+                [ ANSITerminal.Bold; color ]
+                (Printf.sprintf "%s\t%s\t$%s\t\t$%s\t\t%s%%\n" symbol shares
+                   purchase_price current_price percent_change)
+          | _ -> ())
+        data_rows
 
 let fetch_stock_data symbol =
   let url =
@@ -95,15 +118,22 @@ let add_stock user_id symbol shares purchase_price =
     let shares_str = string_of_int shares in
     let purchase_price_str = string_of_float purchase_price in
     let new_stock = [ symbol; shares_str; purchase_price_str; "0.0"; "0.0" ] in
-    save_user_stock_financials user_id (stocks @ [ new_stock ])
+    save_user_stock_financials user_id (stocks @ [ new_stock ]);
+    display_stocks ("data/" ^ user_id ^ "_stock_financials.csv")
   with
   | Failure err -> Printf.printf "Error adding stock: %s\n" err
   | ex -> Printf.printf "Unexpected error: %s\n" (Printexc.to_string ex)
 
 let remove_stock user_id symbol =
-  let stocks = load_user_stock_financials user_id in
-  let filtered_stocks = List.filter (fun row -> List.hd row <> symbol) stocks in
-  save_user_stock_financials user_id filtered_stocks
+  let path = "data/" ^ user_id ^ "_stock_financials.csv" in
+  if Data.search symbol path then (
+    let stocks = load_user_stock_financials user_id in
+    let filtered_stocks =
+      List.filter (fun row -> List.hd row <> symbol) stocks
+    in
+    save_user_stock_financials user_id filtered_stocks;
+    print_string [ Foreground Green ] "\nStock removed successfully!\n")
+  else print_string [ Foreground Red ] "\nStock symbol not found.\n"
 
 let modify_stock user_id symbol shares purchase_price last_price =
   let stocks = load_user_stock_financials user_id in
@@ -121,10 +151,10 @@ let modify_stock user_id symbol shares purchase_price last_price =
         | _ -> row)
       stocks
   in
-  save_user_stock_financials user_id new_stocks;
-  if List.exists (fun row -> List.hd row = symbol) new_stocks then
-    Printf.printf "\n"
-  else Printf.printf "Stock symbol not found.\n"
+  if List.exists (fun row -> List.hd row = symbol) new_stocks then (
+    save_user_stock_financials user_id new_stocks;
+    print_string [ Foreground Green ] "Stock modified successfully!\n")
+  else print_string [ Foreground Red ] "\nStock symbol not found.\n"
 
 let view_stock_spread user =
   let stocks = load_user_stock_financials user in
@@ -201,25 +231,3 @@ let update_and_calculate_changes user_id =
       stocks
   in
   save_user_stock_financials user_id updated_stocks
-
-let display_stocks path =
-  let csv_content = Csv.load path in
-  match csv_content with
-  | [] -> print_endline "No data available."
-  | _ :: data_rows ->
-      Printf.printf
-        "Symbol\tShares\tPurchase Price\tCurrent Price\tPercent Change\n";
-      List.iter
-        (fun row ->
-          match row with
-          | [ symbol; shares; purchase_price; current_price; percent_change ] ->
-              let color =
-                if float_of_string percent_change >= 0.0 then ANSITerminal.green
-                else ANSITerminal.red
-              in
-              ANSITerminal.print_string
-                [ ANSITerminal.Bold; color ]
-                (Printf.sprintf "%s\t%s\t$%s\t\t$%s\t\t%s%%\n" symbol shares
-                   purchase_price current_price percent_change)
-          | _ -> ())
-        data_rows

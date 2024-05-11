@@ -197,7 +197,8 @@ and process_choice user =
   | "1" -> mood_interface user
   | "2" -> health_interface user
   | "3" -> financial_interface user
-  | "4" ->
+  | "4" -> ()
+  | "5" ->
       print_endline "Exiting...";
       exit 0
   | _ -> dashboard_login user
@@ -210,10 +211,10 @@ and dashboard_login user =
       "1. Mood Tracker\n";
       "2. Health Tracker\n";
       "3. Finances Tracker\n";
-      (* "4. Goal Tracker\n"; *)
-      "4. Exit\n";
+      "4. Goal Tracker\n";
+      "5. Exit\n";
     ];
-  print_string [ Bold ] "Please choose an option (1-4): ";
+  print_string [ Bold ] "Please choose an option (1-5): ";
   process_choice user
 
 (* financial interface *)
@@ -355,7 +356,6 @@ and stock_input user =
   match choice with
   | "1" ->
       prompt_add_stock user;
-      Financial_stock.display_stocks ("data/" ^ user ^ "_stock_financials.csv");
       manage_stock_options user
   | "2" ->
       prompt_remove_stock user;
@@ -383,23 +383,29 @@ and prompt_add_stock user =
       "\nPlease enter a valid symbol or type 'back' to return."
   with
   | None -> manage_stock_options user
-  | Some symbol -> (
-      match
-        get_valid_int "\nEnter number of shares: "
-          "\nPlease enter a valid integer number of shares."
-      with
-      | None -> manage_stock_options user
-      | Some shares -> (
-          match
-            get_valid_float
-              "\nEnter purchase price (use a decimal point for cents): "
-              "\nPlease enter a valid price."
-          with
-          | None -> manage_stock_options user
-          | Some price ->
-              Financial_stock.add_stock user symbol shares price;
-              print_string [ Foreground Green ] "\nStock added successfully!\n";
-              manage_stock_options user))
+  | Some symbol ->
+      if String.length symbol <= 5 && String.length symbol > 0 then
+        let symbol = String.uppercase_ascii symbol in
+        match
+          get_valid_int "\nEnter number of shares: "
+            "\nPlease enter a valid integer number of shares."
+        with
+        | None -> manage_stock_options user
+        | Some shares -> (
+            match
+              get_valid_float
+                "\nEnter purchase price (use a decimal point for cents): "
+                "\nPlease enter a valid price."
+            with
+            | None -> manage_stock_options user
+            | Some price ->
+                Financial_stock.add_stock user symbol shares price;
+                print_string [ Foreground Green ]
+                  "\nStock added successfully!\n";
+                manage_stock_options user)
+      else
+        print_string [ Foreground Red ]
+          "\nPlease enter a valid stock symbol! (1-5 characters)\n"
 
 and prompt_remove_stock user =
   match
@@ -409,7 +415,6 @@ and prompt_remove_stock user =
   | None -> manage_stock_options user
   | Some symbol ->
       Financial_stock.remove_stock user symbol;
-      print_string [ Foreground Green ] "\nStock removed successfully!\n";
       manage_stock_options user
 
 and prompt_modify_stock user =
@@ -438,8 +443,6 @@ and prompt_modify_stock user =
               | Some last_price ->
                   Financial_stock.modify_stock user symbol shares purchase_price
                     last_price;
-                  print_string [ Foreground Green ]
-                    "Stock modified successfully!\n";
                   manage_stock_options user
               | None -> manage_stock_options user)
           | None -> manage_stock_options user)
