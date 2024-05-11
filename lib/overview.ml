@@ -449,25 +449,23 @@ and prompt_modify_stock user =
       | None -> manage_stock_options user)
   | _ -> manage_stock_options user
 
-
-  (* Goals interface *)
-
+(* Goals interface *)
 
 and goals_interface user =
-  print_string [ Bold; Foreground Magenta] "\nGoals Tracker\n";
+  print_string [ Bold; Foreground Magenta ] "\nGoals Tracker\n";
   print_strings [ Reset ]
-  (*begin by displaying all current goals, then prompt with menu?*)
+    (*begin by displaying all current goals, then prompt with menu?*)
     [
       "1. Add a goal\n";
       "2. Log progress towards a goal\n";
       "3. Mark a goal as complete\n";
       "4. Remove a goal\n";
       "5. View all goals\n";
-      "6. View progress log\n"; (*should display all current goals to user*)
+      "6. View progress log\n";
+      (*should display all current goals to user*)
+      "7. Return to main menu\n";
     ];
-  print_string [ Bold ] "Please choose an option (1-6): ";
+  print_string [ Bold ] "Please choose an option (1-7): ";
   goals_menu_choice user
 
-
-and goals_menu_choice user =
-  print_endline user
+and goals_menu_choice user = print_endline user
