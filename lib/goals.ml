@@ -1,5 +1,3 @@
-(*add colored output later; ocaml was throwing a fit*)
-
 open ANSITerminal
 
 let add_new_goal user =
