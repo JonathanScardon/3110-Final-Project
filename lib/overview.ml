@@ -450,8 +450,7 @@ and prompt_modify_stock user =
   | _ -> manage_stock_options user
 
 
-  (* Goals interface *)
-
+  (*goals interface*)
 
 and goals_interface user =
   print_string [ Bold; Foreground Magenta] "\nGoals Tracker\n";
@@ -470,4 +469,11 @@ and goals_interface user =
 
 
 and goals_menu_choice user =
-  print_endline user
+  let choice = read_line () in
+  match choice with
+  | "1" ->
+    Goals.add_new_goal user;
+    goals_interface user
+  | _ -> 
+    print_string [] "unsupported option";
+    goals_interface user;
