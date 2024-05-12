@@ -66,6 +66,7 @@ and delete () =
         Sys.remove ("data/" ^ username ^ "_financials.csv");
         Sys.remove ("data/" ^ username ^ "_stock_financials.csv");
         Sys.remove ("data/" ^ username ^ "_transaction_log.csv");
+        Sys.remove ("data/" ^ username ^ "_goals_list.csv");
         print_string [ Foreground Green ] "\nAccount removed successfully.";
         print_menu ();
         process_choice ()

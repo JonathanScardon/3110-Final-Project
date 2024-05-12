@@ -449,7 +449,7 @@ and prompt_modify_stock user =
       | None -> manage_stock_options user)
   | _ -> manage_stock_options user
 
-(* Goals interface *)
+(* goals interface *)
 
 and goals_interface user =
   print_string [ Bold; Foreground Magenta ] "\nGoals Tracker\n";
