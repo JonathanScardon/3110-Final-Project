@@ -474,6 +474,9 @@ and goals_menu_choice user =
   | "1" ->
     Goals.add_new_goal user;
     goals_interface user
+  | "5" ->
+    Goals.display_all_goals user;
+    goals_interface user
   | _ -> 
     print_string [] "unsupported option";
     goals_interface user;
