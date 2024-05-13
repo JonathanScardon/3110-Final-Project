@@ -1,6 +1,6 @@
 open OUnit2
 open Test
-open Final_project.Data
+open Ocamlife.Data
 
 (* testing get_data, search, search2, find_entry, data_to_list *)
 (* test and add to .mli: remove_data_list, edit_data *)

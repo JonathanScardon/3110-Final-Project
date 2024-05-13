@@ -2,7 +2,7 @@
 
 open OUnit2
 open Test
-open Final_project.Financial
+open Ocamlife.Financial
 
 let test1_modify_financial _ =
   assert_equal

@@ -1,6 +1,6 @@
 open OUnit2
 open Test
-open Final_project.Mood
+open Ocamlife.Mood
 
 let test_validate_happiness _ =
   assert_equal (Some 5) (validate_happiness "5")

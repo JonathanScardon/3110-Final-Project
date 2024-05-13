@@ -7,12 +7,12 @@ val string_of_list_list : string list list -> string
   single string representation, with each list converted by [string_of_list] 
   and separated by "; ". *)
 
-val find_and_set_directory : string -> unit
+val find_and_set_directory : string -> string
 (** [find_and_set_directory target_dir] changes the current working directory 
   to [target_dir]. If the directory cannot be found by traversing up to the 
   root, it raises an error. *)
 
-val run_projects : OUnit2.test -> unit
+val run_tests : OUnit2.test -> unit
 (** [run_tests suite] runs the test suite [suite] after changing the directory 
   to the project's root directory named "3110-final-project". It handles 
   directory changes and catches exceptions related to file or system errors. *)

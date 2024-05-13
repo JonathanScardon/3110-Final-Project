@@ -1,6 +1,6 @@
 open OUnit2
 open Test
-open Final_project.Auth
+open Ocamlife.Auth
 
 let test_password_not_unhashed _ =
   assert_bool "Hashed password should not match the plaintext"
