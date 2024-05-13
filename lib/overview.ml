@@ -29,11 +29,11 @@ let rec get_valid_string prompt error_msg =
   print_string [ Reset ] prompt;
   let input = read_line () in
   if input = "" || input = "back" then
-    if input = "back" then None (* If user types 'back', return None *)
+    if input = "back" then None
     else (
       print_endline error_msg;
       get_valid_string prompt error_msg)
-  else Some input (* Return input wrapped in Some if it's valid *)
+  else Some input
 
 (* mood interface *)
 
@@ -449,13 +449,12 @@ and prompt_modify_stock user =
       | None -> manage_stock_options user)
   | _ -> manage_stock_options user
 
-
-  (*goals interface*)
+(* goals interface *)
 
 and goals_interface user =
-  print_string [ Bold; Foreground Magenta] "\nGoals Tracker\n";
+  print_string [ Bold; Foreground Magenta ] "\nGoals Tracker\n";
   print_strings [ Reset ]
-  (*begin by displaying all current goals, then prompt with menu?*)
+    (*begin by displaying all current goals, then prompt with menu?*)
     [
       "1. Add a goal\n";
       "2. Log progress towards a goal\n";
@@ -465,7 +464,7 @@ and goals_interface user =
       "6. View progress log\n";
       "7. Exit\n"
     ];
-  print_string [ Bold ] "Please choose an option (1-6): ";
+  print_string [ Bold ] "Please choose an option (1-7): ";
   goals_menu_choice user
 
 

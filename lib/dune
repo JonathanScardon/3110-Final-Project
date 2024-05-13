@@ -1,14 +1,5 @@
 (library
- (name final_project)
- (libraries
-  csv
-  cryptokit
-  unix
-  ANSITerminal
-  cohttp
-  cohttp-lwt-unix
-  curl
-  yojson
-  lwt)
+ (name ocamlife)
+ (libraries csv cryptokit unix ANSITerminal curl yojson)
  (preprocess
-  (pps bisect_ppx lwt_ppx)))
+  (pps bisect_ppx)))
