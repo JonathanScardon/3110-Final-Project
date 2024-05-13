@@ -460,9 +460,10 @@ and goals_interface user =
       "2. Log progress towards a goal\n";
       "3. Mark a goal as complete\n";
       "4. Remove a goal\n";
-      "5. View all goals\n";
-      "6. View progress log\n";
-      "7. Exit\n"
+      "5. View in-progress goals\n";
+      "6. View complete goals\n";
+      "7. View progress logs\n";
+      "8. Exit\n"
     ];
   print_string [ Bold ] "Please choose an option (1-7): ";
   goals_menu_choice user
@@ -484,9 +485,12 @@ and goals_menu_choice user =
     Goals.remove_goal user;
     goals_interface user
   | "5" ->
-    Goals.display_all_goals user;
+    Goals.view_incomplete_goals user;
     goals_interface user
-  | "7" -> dashboard_login user
+  | "6" ->
+    Goals.view_complete_goals user;
+    goals_interface user
+  | "8" -> dashboard_login user
   | _ -> 
     print_string [] "unsupported option";
     goals_interface user;

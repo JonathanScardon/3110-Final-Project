@@ -5,6 +5,10 @@ let incomplete_goals_path user =
   "data/" ^ user ^ "_incomplete_goals.csv"
 
 
+let complete_goals_path user =
+  "data/" ^ user ^ "_complete_goals.csv"
+
+
 let add_new_goal user =
   print_string [] "\n";
   print_string [] "What would you like to title your new goal?\n";
@@ -26,14 +30,13 @@ let add_new_goal user =
     end
 
 
-let display_all_goals user =
+let display_goals path header1 header2 =
   print_newline ();
-  let path = incomplete_goals_path user in
   let csv_content = Csv.load path in
   match csv_content with
   | [] -> print_endline "No goals available."
   | _  ->
-      print_string [Bold; Foreground Yellow] (Printf.sprintf "%-20s\t%s\n" "Goal" "Date Added");
+      print_string [Bold; Foreground Yellow] (Printf.sprintf "%-20s\t%s\n" header1 header2);
       List.iter
         (fun row ->
           match row with
@@ -42,6 +45,16 @@ let display_all_goals user =
           | _ -> print_endline "Invalid data format")
         csv_content
 
+
+let view_incomplete_goals user =
+  let path = incomplete_goals_path user in
+  display_goals path "Goals" "Date Added"
+
+
+let view_complete_goals user =
+  let path = complete_goals_path user in
+  display_goals path "Goals" "Date Added"
+  
 
 let log_progress user =
   print_newline ();
@@ -102,7 +115,7 @@ let complete_goal user =
   if Data.search target_goal incomplete_goal_path then
     begin
     remove_goal_helper user target_goal;
-    let complete_goal_path = "data/" ^ user ^ "_complete_goals.csv" in
+    let complete_goal_path = complete_goals_path user in
     Data.add_data (target_goal :: Mood.curr_date :: []) complete_goal_path;    
     print_string [Bold;Foreground Green] ("Congratulations on accomplishing your goal! " ^ target_goal ^ " is now marked as complete.\n");
     end
