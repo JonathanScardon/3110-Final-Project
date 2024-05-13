@@ -11,3 +11,5 @@ val remove_goal: string -> unit
 val view_incomplete_goals: string -> unit
 
 val view_complete_goals: string -> unit
+
+val view_progress_log: string -> unit

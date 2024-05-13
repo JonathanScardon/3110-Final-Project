@@ -34,7 +34,7 @@ let display_goals path header1 header2 =
   print_newline ();
   let csv_content = Csv.load path in
   match csv_content with
-  | [] -> print_endline "No goals available."
+  | [] -> print_endline "No available data."
   | _  ->
       print_string [Bold; Foreground Yellow] (Printf.sprintf "%-20s\t%s\n" header1 header2);
       List.iter
@@ -48,13 +48,29 @@ let display_goals path header1 header2 =
 
 let view_incomplete_goals user =
   let path = incomplete_goals_path user in
-  display_goals path "Goals" "Date Added"
+  display_goals path "In-Progress Goals" "Date Added"
 
 
 let view_complete_goals user =
   let path = complete_goals_path user in
-  display_goals path "Goals" "Date Added"
-  
+  display_goals path "Complete Goals" "Date Completed"
+
+
+let view_progress_log user =
+  print_newline ();
+  print_string [] "Which goal's progress log do you want to view? ";
+  let target_goal = read_line () in
+  let path_one = incomplete_goals_path user in
+  let path_two = complete_goals_path user in
+  let header1 = "Progress Description" in
+  let header2 = "Date" in
+  if Data.search target_goal path_one || Data.search target_goal path_two then
+    let log_path = "data/" ^ user ^ "_" ^ target_goal ^ ".csv" in
+    display_goals log_path header1 header2
+  else
+    print_string [Bold;Foreground Red] "Error: Goal not found\n"
+
+
 
 let log_progress user =
   print_newline ();
@@ -70,7 +86,8 @@ let log_progress user =
     print_string [Bold; Foreground Green] "Progress successfully logged!\n";
     end
   else
-    print_string [Bold; Foreground Red] "Error: Goal not found\n"
+    print_string [Bold;Foreground Red] "Error: Goal not found\n"
+
 
 
 let remove_goal_helper user goal_id =

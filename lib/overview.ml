@@ -490,6 +490,9 @@ and goals_menu_choice user =
   | "6" ->
     Goals.view_complete_goals user;
     goals_interface user
+  | "7" ->
+    Goals.view_progress_log user;
+    goals_interface user
   | "8" -> dashboard_login user
   | _ -> 
     print_string [] "unsupported option";
