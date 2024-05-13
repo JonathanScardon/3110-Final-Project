@@ -463,34 +463,33 @@ and goals_interface user =
       "5. View in-progress goals\n";
       "6. View complete goals\n";
       "7. View progress logs\n";
-      "8. Exit\n"
+      "8. Exit\n";
     ];
   print_string [ Bold ] "Please choose an option (1-7): ";
   goals_menu_choice user
-
 
 and goals_menu_choice user =
   let choice = read_line () in
   match choice with
   | "1" ->
-    Goals.add_new_goal user;
-    goals_interface user
+      Goals.add_new_goal user;
+      goals_interface user
   | "2" ->
-    Goals.log_progress user;
-    goals_interface user
+      Goals.log_progress user;
+      goals_interface user
   | "3" ->
-    Goals.complete_goal user;
-    goals_interface user
+      Goals.complete_goal user;
+      goals_interface user
   | "4" ->
-    Goals.remove_goal user;
-    goals_interface user
+      Goals.remove_goal user;
+      goals_interface user
   | "5" ->
-    Goals.view_incomplete_goals user;
-    goals_interface user
+      Goals.view_incomplete_goals user;
+      goals_interface user
   | "6" ->
-    Goals.view_complete_goals user;
-    goals_interface user
+      Goals.view_complete_goals user;
+      goals_interface user
   | "8" -> dashboard_login user
-  | _ -> 
-    print_string [] "unsupported option";
-    goals_interface user;
+  | _ ->
+      print_string [] "unsupported option";
+      goals_interface user

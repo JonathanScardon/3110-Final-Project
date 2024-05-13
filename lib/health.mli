@@ -1,5 +1,3 @@
-(* TODO: add specs *)
-
 val add_health_data : string -> string -> unit
 (** [add_health data user journal] prompts the user for input depending on 
     which [journal] is provided, and adds user's health data to 

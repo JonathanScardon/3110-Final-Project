@@ -2,8 +2,7 @@ open OUnit2
 open Test
 open Ocamlife.Data
 
-(* testing get_data, search, search2, find_entry, data_to_list *)
-(* test and add to .mli: remove_data_list, edit_data *)
+(* get_data, search, search2, find_entry, data_to_list, remove_data_list, edit_data *)
 
 let suite =
   "Data.ml"
@@ -92,6 +91,28 @@ let suite =
            assert_equal true
              (search2 "a" "a" "data/for_testing/test2_data.csv")
              ~printer:string_of_bool );
+         ( "find_entry unique id" >:: fun _ ->
+           assert_equal "\ng a i\n"
+             (find_entry "g" "data/for_testing/test2_data.csv")
+             ~printer:(fun x -> x) );
+         ( "find_entry duplicate ids" >:: fun _ ->
+           assert_equal "\na b c\n"
+             (find_entry "a" "data/for_testing/test2_data.csv")
+             ~printer:(fun x -> x) );
+         ( "data_to_list empty" >:: fun _ ->
+           assert_equal []
+             (data_to_list "data/for_testing/test1_quotes.csv")
+             ~printer:Test.string_of_list );
+         ( "data_to_list three rows" >:: fun _ ->
+           assert_equal
+             [ "a"; "b"; "c"; "a"; "a"; "f"; "g"; "a"; "i" ]
+             (data_to_list "data/for_testing/test2_data.csv")
+             ~printer:Test.string_of_list );
+         ( "data_to_list three cols" >:: fun _ ->
+           assert_equal
+             [ "quote 1"; "quote 2"; "quote 3" ]
+             (data_to_list "data/for_testing/test2_quotes.csv")
+             ~printer:Test.string_of_list );
        ]
 
 let () = run_tests suite
