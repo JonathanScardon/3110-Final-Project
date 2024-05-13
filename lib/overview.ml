@@ -477,6 +477,9 @@ and goals_menu_choice user =
   | "2" ->
     Goals.log_progress user;
     goals_interface user
+  | "3" ->
+    Goals.complete_goal user;
+    goals_interface user
   | "5" ->
     Goals.display_all_goals user;
     goals_interface user

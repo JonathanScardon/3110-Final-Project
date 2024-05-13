@@ -11,7 +11,7 @@ let add_new_goal user =
   print_string [] "\n";
   print_string [] "What would you like to title your new goal?\n";
   let goal_name = read_line () in
-  let path = "data/" ^ user ^ "_goals_list.csv" in
+  let path = "data/" ^ user ^ "_incomplete_goals.csv" in
   if Data.search goal_name path then
     print_string [Bold; Foreground Red] "Error: you've already added this goal!\n"
   else
@@ -29,7 +29,7 @@ let add_new_goal user =
 
 let display_all_goals user =
   print_newline ();
-  let path = "data/" ^ user ^ "_goals_list.csv" in
+  let path = "data/" ^ user ^ "_incomplete_goals.csv" in
   let csv_content = Csv.load path in
   match csv_content with
   | [] -> print_endline "No goals available."
@@ -48,7 +48,7 @@ let log_progress user =
   print_newline ();
   print_string [] "Which goal would like you like to log progress towards? ";
   let target_goal = read_line () in
-  let path = "data/" ^ user ^ "_goals_list.csv" in
+  let path = "data/" ^ user ^ "_incomplete_goals.csv" in
   if Data.search target_goal path then
     begin
     print_string [] "Please describe the progress you've made: ";
@@ -58,5 +58,18 @@ let log_progress user =
     print_string [Bold; Foreground Green] "Progress successfully logged!\n";
     end
   else
-    print_string [Bold; Foreground Red] "This goal does not exist"
+    print_string [Bold; Foreground Red] "Error: Goal not found\n"
 
+let complete_goal user =
+  print_newline ();
+  print_string [] "Which goal would you like to mark as complete? ";
+  let target_goal = read_line () in
+  let incomplete_goal_path = "data/" ^ user ^ "_incomplete_goals.csv" in
+  if Data.search target_goal incomplete_goal_path then
+    begin
+    let complete_goal_path = "data/" ^ user ^ "complete_goals.csv" in
+    Data.add_data (target_goal :: Mood.curr_date :: []) complete_goal_path;    
+    print_string [Bold;Foreground Green] ("Congratulations on accomplishing your goal!" ^ target_goal ^ "is now marked as complete");
+    end
+  else
+    print_string [Bold;Foreground Red] "Error: Goal not found\n"
