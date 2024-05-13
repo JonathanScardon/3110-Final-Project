@@ -2,7 +2,7 @@ open OUnit2
 open Test
 open Ocamlife.Data
 
-(* get_data, search, search2, find_entry, data_to_list, remove_data_list, edit_data *)
+(* get_data, search, search2, find_entry, data_to_list, remove_data_list *)
 
 let suite =
   "Data.ml"
@@ -113,6 +113,51 @@ let suite =
              [ "quote 1"; "quote 2"; "quote 3" ]
              (data_to_list "data/for_testing/test2_quotes.csv")
              ~printer:Test.string_of_list );
+         ( "remove_data_list one entry" >:: fun _ ->
+           assert_equal []
+             (remove_data_list [ [ "a" ] ] "a")
+             ~printer:Test.string_of_list_list );
+         ( "remove_data_list one row first entry" >:: fun _ ->
+           assert_equal []
+             (remove_data_list [ [ "a"; "b"; "c" ] ] "a")
+             ~printer:Test.string_of_list_list );
+         ( "remove_data_list one row second entry" >:: fun _ ->
+           assert_equal []
+             (remove_data_list [ [ "a"; "b"; "c" ] ] "b")
+             ~printer:Test.string_of_list_list );
+         ( "remove_data_list one row third entry" >:: fun _ ->
+           assert_equal []
+             (remove_data_list [ [ "a"; "b"; "c" ] ] "c")
+             ~printer:Test.string_of_list_list );
+         ( "remove_data_list two rows" >:: fun _ ->
+           assert_equal
+             [ [ "a"; "b"; "c" ] ]
+             (remove_data_list [ [ "a"; "b"; "c" ]; [ "d"; "e"; "f" ] ] "d")
+             ~printer:Test.string_of_list_list );
+         ( "remove_data_list two rows duplicate ids" >:: fun _ ->
+           assert_equal
+             [ [ "a"; "e"; "f" ] ]
+             (remove_data_list [ [ "a"; "b"; "c" ]; [ "a"; "e"; "f" ] ] "a")
+             ~printer:Test.string_of_list_list );
+         ( "remove_data_list three rows" >:: fun _ ->
+           assert_equal
+             [ [ "a"; "b"; "c" ]; [ "a"; "e"; "f" ] ]
+             (remove_data_list
+                [ [ "a"; "b"; "c" ]; [ "a"; "e"; "f" ]; [ "n"; "p"; "f" ] ]
+                "n")
+             ~printer:Test.string_of_list_list );
+         ( "remove_data_list id not found" >:: fun _ ->
+           assert_raises Not_found (fun () ->
+               remove_data_list
+                 [ [ "a"; "b"; "c" ]; [ "a"; "e"; "f" ]; [ "n"; "p"; "f" ] ]
+                 "x") );
+         ( "remove_data_list empty id" >:: fun _ ->
+           assert_raises Not_found (fun () ->
+               remove_data_list
+                 [ [ "a"; "b"; "c" ]; [ "a"; "e"; "f" ]; [ "n"; "p"; "f" ] ]
+                 "") );
+         ( "remove_data_list empty" >:: fun _ ->
+           assert_raises Not_found (fun () -> remove_data_list [] "") );
        ]
 
 let () = run_tests suite

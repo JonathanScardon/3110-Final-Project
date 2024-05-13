@@ -48,5 +48,5 @@ val data_to_list : string -> string list
 (** [data_to_list path] converts all CSV data from [path] into a list. *)
 
 val remove_data_list : string list list -> string -> string list list
-(** [remove_data_list lst data] removes the row containing [data] from [lst]. 
+(** [remove_data_list lst data] removes the first row containing [data] from [lst]. 
     Raises [Not_found] if no row contains [data]. *)
