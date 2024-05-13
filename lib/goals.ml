@@ -132,6 +132,10 @@ let complete_goal user =
   if Data.search target_goal incomplete_goal_path then
     begin
     remove_goal_helper user target_goal;
+    (*adds completed to progress log*)
+    let goal_file_path = "data/" ^ user ^ "_" ^ target_goal ^ ".csv" in
+    Data.add_data ("Completed!" :: Mood.curr_date :: []) goal_file_path;
+    (*adds goal to file with completed goals*)
     let complete_goal_path = complete_goals_path user in
     Data.add_data (target_goal :: Mood.curr_date :: []) complete_goal_path;    
     print_string [Bold;Foreground Green] ("Congratulations on accomplishing your goal! " ^ target_goal ^ " is now marked as complete.\n");
