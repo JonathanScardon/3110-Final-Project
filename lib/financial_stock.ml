@@ -1,5 +1,4 @@
 open Yojson.Basic.Util
-open ANSITerminal
 
 (* stock tracker *)
 let api_key = "64ROAIJNDDZD98UE"
@@ -12,28 +11,6 @@ let load_user_stock_financials user_id =
 let save_user_stock_financials user_id data =
   let path = "data/" ^ user_id ^ "_stock_financials.csv" in
   Csv.save path data
-
-let display_stocks path =
-  let csv_content = Csv.load path in
-  match csv_content with
-  | [] -> print_endline "No data available."
-  | _ :: data_rows ->
-      Printf.printf
-        "Symbol\tShares\tPurchase Price\tCurrent Price\tPercent Change\n";
-      List.iter
-        (fun row ->
-          match row with
-          | [ symbol; shares; purchase_price; current_price; percent_change ] ->
-              let color =
-                if float_of_string percent_change >= 0.0 then ANSITerminal.green
-                else ANSITerminal.red
-              in
-              ANSITerminal.print_string
-                [ ANSITerminal.Bold; color ]
-                (Printf.sprintf "%s\t%s\t$%s\t\t$%s\t\t%s%%\n" symbol shares
-                   purchase_price current_price percent_change)
-          | _ -> ())
-        data_rows
 
 let fetch_stock_data symbol =
   let url =
@@ -62,42 +39,34 @@ let fetch_stock_data symbol =
 let update_stock_prices user_id =
   let stocks = load_user_stock_financials user_id in
   let updated_stocks =
-    List.map
-      (fun row ->
+    List.mapi
+      (fun _ row ->
         match row with
-        | [ symbol; shares; purchase_price; _ ] -> (
+        | symbol :: shares :: purchase_price_str :: _ :: _ -> (
             match fetch_stock_data symbol with
-            | Some price -> [ symbol; shares; purchase_price; price ]
+            | Some new_current_price ->
+                let purchase_price = float_of_string purchase_price_str in
+                let current_price = float_of_string new_current_price in
+                let percent_change =
+                  if purchase_price = 0.0 then 0.0
+                  else
+                    (current_price -. purchase_price) /. purchase_price *. 100.0
+                in
+                let new_percent_change_str =
+                  Printf.sprintf "%.2f" percent_change
+                in
+                [
+                  symbol;
+                  shares;
+                  purchase_price_str;
+                  new_current_price;
+                  new_percent_change_str;
+                ]
             | None -> row)
         | _ -> row)
       stocks
   in
   save_user_stock_financials user_id updated_stocks
-
-(* let update_stock_prices user_id =
-   let stocks = load_user_stock_financials user_id in
-   let updated_stocks =
-     List.map
-       (fun row ->
-         match row with
-         | [ symbol; shares; purchase_price; last_price ] -> (
-             Printf.printf "Updating price for %s\n" symbol;
-             (* Debug information *)
-             match fetch_stock_data symbol with
-             | Some price ->
-                 Printf.printf "New price for %s is %s\n" symbol price;
-                 [ symbol; shares; purchase_price; price ]
-             | None ->
-                 Printf.printf
-                   "Failed to fetch new price for %s, keeping last known price %s\n"
-                   symbol last_price;
-                 [ symbol; shares; purchase_price; last_price ])
-         | _ ->
-             Printf.printf "Skipping malformed row\n";
-             row)
-       stocks
-   in
-   save_user_stock_financials user_id updated_stocks *)
 
 let calculate_portfolio_value user_id =
   let stocks = load_user_stock_financials user_id in
@@ -118,43 +87,47 @@ let add_stock user_id symbol shares purchase_price =
     let shares_str = string_of_int shares in
     let purchase_price_str = string_of_float purchase_price in
     let new_stock = [ symbol; shares_str; purchase_price_str; "0.0"; "0.0" ] in
-    save_user_stock_financials user_id (stocks @ [ new_stock ]);
-    display_stocks ("data/" ^ user_id ^ "_stock_financials.csv")
+    save_user_stock_financials user_id (stocks @ [ new_stock ])
   with
   | Failure err -> Printf.printf "Error adding stock: %s\n" err
   | ex -> Printf.printf "Unexpected error: %s\n" (Printexc.to_string ex)
 
 let remove_stock user_id symbol =
-  let path = "data/" ^ user_id ^ "_stock_financials.csv" in
-  if Data.search symbol path then (
-    let stocks = load_user_stock_financials user_id in
-    let filtered_stocks =
-      List.filter (fun row -> List.hd row <> symbol) stocks
-    in
-    save_user_stock_financials user_id filtered_stocks;
-    print_string [ Foreground Green ] "\nStock removed successfully!\n")
-  else print_string [ Foreground Red ] "\nStock symbol not found.\n"
+  let stocks = load_user_stock_financials user_id in
+  let filtered_stocks = List.filter (fun row -> List.hd row <> symbol) stocks in
+  save_user_stock_financials user_id filtered_stocks
 
 let modify_stock user_id symbol shares purchase_price last_price =
   let stocks = load_user_stock_financials user_id in
-  let new_stocks =
+
+  let new_stocks, modified =
     List.map
       (fun row ->
         match row with
         | existing_symbol :: _ when existing_symbol = symbol ->
-            [
-              symbol;
-              string_of_int shares;
-              Printf.sprintf "%.2f" purchase_price;
-              Printf.sprintf "%.2f" last_price;
-            ]
-        | _ -> row)
+            let percent_change =
+              if purchase_price = 0.0 then 0.0
+              else (last_price -. purchase_price) /. purchase_price *. 100.0
+            in
+            ( [
+                symbol;
+                string_of_int shares;
+                Printf.sprintf "%.2f" purchase_price;
+                Printf.sprintf "%.2f" last_price;
+                Printf.sprintf "%.2f" percent_change;
+              ],
+              true )
+        | _ -> (row, false))
       stocks
+    |> List.split
   in
-  if List.exists (fun row -> List.hd row = symbol) new_stocks then (
+
+  if List.exists (fun flag -> flag) modified then (
     save_user_stock_financials user_id new_stocks;
-    print_string [ Foreground Green ] "Stock modified successfully!\n")
-  else print_string [ Foreground Red ] "\nStock symbol not found.\n"
+    Printf.printf "Stock modified successfully. Updated data for %s.\n" symbol)
+  else
+    Printf.printf "Error: Stock symbol '%s' not found. No changes made.\n"
+      symbol
 
 let view_stock_spread user =
   let stocks = load_user_stock_financials user in
@@ -231,3 +204,25 @@ let update_and_calculate_changes user_id =
       stocks
   in
   save_user_stock_financials user_id updated_stocks
+
+let display_stocks path =
+  let csv_content = Csv.load path in
+  match csv_content with
+  | [] -> print_endline "No data available."
+  | _ :: data_rows ->
+      Printf.printf
+        "Symbol\tShares\tPurchase Price\tCurrent Price\tPercent Change\n";
+      List.iter
+        (fun row ->
+          match row with
+          | [ symbol; shares; purchase_price; current_price; percent_change ] ->
+              let color =
+                if float_of_string percent_change >= 0.0 then ANSITerminal.green
+                else ANSITerminal.red
+              in
+              ANSITerminal.print_string
+                [ ANSITerminal.Bold; color ]
+                (Printf.sprintf "%s\t%s\t$%s\t\t$%s\t\t%s%%\n" symbol shares
+                   purchase_price current_price percent_change)
+          | _ -> ())
+        data_rows
