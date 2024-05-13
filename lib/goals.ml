@@ -22,7 +22,7 @@ let add_new_goal user =
       Data.add_data (goal_name :: Mood.curr_date :: []) (incomplete_goals_path user);
       let goal_file_path = "data/" ^ user ^ "_" ^ goal_name ^ ".csv" in
       try
-        Csv.save goal_file_path []; (* Initialize the goal file with the goal name and date *)
+        Csv.save goal_file_path [];
         print_string [Bold; Foreground Green] "Goal added successfully!\n"
       with
       | Sys_error msg ->
@@ -78,7 +78,9 @@ let log_progress user =
   print_string [] "Which goal would like you like to log progress towards? ";
   let target_goal = read_line () in
   let path = incomplete_goals_path user in
-  if Data.search target_goal path then
+  if Data.search target_goal (complete_goals_path user) then
+    print_string [Bold;Foreground Red] "Error: you've already completed this goal!\n"
+  else if Data.search target_goal path then
     begin
     print_string [] "Please describe the progress you've made: ";
     let user_progress = read_line () in
@@ -130,7 +132,9 @@ let complete_goal user =
   print_string [] "Which goal would you like to mark as complete? ";
   let target_goal = read_line () in
   let incomplete_goal_path = incomplete_goals_path user in
-  if Data.search target_goal incomplete_goal_path then
+  if Data.search target_goal (complete_goals_path user) then
+    print_string [Bold;Foreground Red] "Error: you've already completed this goal!\n"
+  else if Data.search target_goal incomplete_goal_path then
     begin
     remove_goal_helper user target_goal;
     (*adds completed to progress log*)
