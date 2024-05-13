@@ -1,5 +1,5 @@
 (* main.ml *)
-open Final_project.Auth
+open Ocamlife.Auth
 open ANSITerminal
 
 let print_menu () =
@@ -35,7 +35,7 @@ and invalid_option () =
 
 and login () =
   let username, password = request_credentials "Login" in
-  if Final_project.Auth.username_exists username = false then
+  if Ocamlife.Auth.username_exists username = false then
     username_doesnt_exist ()
   else if authenticate username password 0 then login_success username
   else login_failure ()
@@ -48,14 +48,14 @@ and register () =
 
 and delete () =
   let username, password = request_credentials "Login" in
-  if Final_project.Auth.username_exists username = false then
+  if Ocamlife.Auth.username_exists username = false then
     username_doesnt_exist ()
   else if authenticate username password 0 then (
     print_string [ Reset ]
       "Are you sure you want to delete your account? (y/n) ";
     if read_line () = "y" then (
       try
-        Final_project.Data.remove_data "data/user_credentials.csv" username;
+        Ocamlife.Data.remove_data "data/user_credentials.csv" username;
         Sys.remove ("data/" ^ username ^ "_mood.csv");
         Sys.remove ("data/" ^ username ^ "_quotes.csv");
         Sys.remove ("data/" ^ username ^ "_food.csv");
@@ -101,7 +101,7 @@ and request_credentials prompt =
 
 and login_success user =
   print_string [ Foreground Green ] "Login successful!\n";
-  Final_project.Overview.dashboard_login user
+  Ocamlife.Overview.dashboard_login user
 
 and login_failure () =
   print_string [ Foreground Red ]

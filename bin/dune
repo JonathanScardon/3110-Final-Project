@@ -1,4 +1,4 @@
 (executable
  (public_name ocamlife)
  (name main)
- (libraries final_project ANSITerminal))
+ (libraries ocamlife ANSITerminal))

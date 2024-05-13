@@ -29,11 +29,11 @@ let rec get_valid_string prompt error_msg =
   print_string [ Reset ] prompt;
   let input = read_line () in
   if input = "" || input = "back" then
-    if input = "back" then None (* If user types 'back', return None *)
+    if input = "back" then None
     else (
       print_endline error_msg;
       get_valid_string prompt error_msg)
-  else Some input (* Return input wrapped in Some if it's valid *)
+  else Some input
 
 (* mood interface *)
 
