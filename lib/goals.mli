@@ -4,13 +4,12 @@ val add_new_goal: string -> unit
 
 val log_progress: string -> unit
 (**[log_progress user] asks the user to select a goal to update progress on. If the goal is completed or doesn't exist,
-    it shows an error. Otherwise, it prompts the user for a progress description and adds it to the goal's log*)
+    it shows an error. Otherwise, it prompts the user for a progress description and adds it to the goal's progress log*)
 
 val complete_goal: string -> unit
 (**[complete_goal user] prompts the user to choose a goal to mark as completed. If the goal is already been completed
-    or doesn't exist, it displays an error message. Otherwise, it moves the goal from the user's incmpleted list 
+    or doesn't exist, it displays an error message. Otherwise, it moves the goal from the user's incompleted list 
     to their completed goals.*)
-
 
 val remove_goal: string -> unit
 (**[remove_goal user] prompts the user to select a goal to delete, specifying that only incomplete goals can be removed.
