@@ -494,5 +494,5 @@ and goals_menu_choice user =
       goals_interface user
   | "8" -> dashboard_login user
   | _ ->
-      print_string [] "unsupported option";
+      print_string [] "Invalid option. Please try again.\n";
       goals_interface user
