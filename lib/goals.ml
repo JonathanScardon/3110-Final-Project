@@ -142,3 +142,14 @@ let complete_goal user =
     end
   else
     print_string [Bold;Foreground Red] "Error: Goal not found\n"
+
+
+let delete_goal_logs user =
+  let incomplete_goals = (Data.data_to_list (incomplete_goals_path user)) in
+  let all_goals = incomplete_goals @ (Data.data_to_list (complete_goals_path user)) in
+  let i = ref 0 in  
+  while !i < List.length all_goals do
+    let target_goal = List.nth all_goals !i in
+    Sys.remove ("data/" ^ user ^ "_" ^ target_goal ^".csv");
+    i := !i + 2;
+  done

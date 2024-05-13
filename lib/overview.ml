@@ -456,9 +456,9 @@ and goals_interface user =
   print_strings [ Reset ]
     (*begin by displaying all current goals, then prompt with menu?*)
     [
-      "1. Add a goal\n";
-      "2. Log progress towards a goal\n";
-      "3. Mark a goal as complete\n";
+      "1. Add a new goal\n";
+      "2. Log progress\n";
+      "3. Mark goal as complete\n";
       "4. Remove a goal\n";
       "5. View in-progress goals\n";
       "6. View complete goals\n";
@@ -495,5 +495,5 @@ and goals_menu_choice user =
     goals_interface user
   | "8" -> dashboard_login user
   | _ -> 
-    print_string [] "unsupported option";
+    print_string [] "Invalid Option. Please try again.\n";
     goals_interface user;
