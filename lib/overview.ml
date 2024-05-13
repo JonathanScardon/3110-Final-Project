@@ -462,7 +462,8 @@ and goals_interface user =
       "3. Mark a goal as complete\n";
       "4. Remove a goal\n";
       "5. View all goals\n";
-      "6. View progress log\n"; (*should display all current goals to user*)
+      "6. View progress log\n";
+      "7. Exit\n"
     ];
   print_string [ Bold ] "Please choose an option (1-6): ";
   goals_menu_choice user
@@ -474,9 +475,13 @@ and goals_menu_choice user =
   | "1" ->
     Goals.add_new_goal user;
     goals_interface user
+  | "2" ->
+    Goals.log_progress user;
+    goals_interface user
   | "5" ->
     Goals.display_all_goals user;
     goals_interface user
+  | "7" -> dashboard_login user
   | _ -> 
     print_string [] "unsupported option";
     goals_interface user;
