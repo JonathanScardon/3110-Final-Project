@@ -19,7 +19,7 @@ val search2 : string -> string -> string -> bool
 
 val find_entry : string -> string -> string
 (** [find_entry id path] returns the first entry with [id] as a first element, 
-    contained within the CSV [path]. *)
+    contained within the CSV [path]. Requires: [id] must exist as a first element. *)
 
 val edit : string -> string -> string -> unit
 (** [edit id path data] edits the row with [id] as a first element to contain 
@@ -46,3 +46,7 @@ val remove_entry : string -> unit
 
 val data_to_list : string -> string list
 (** [data_to_list path] converts all CSV data from [path] into a list. *)
+
+val remove_data_list : string list list -> string -> string list list
+(** [remove_data_list lst data] removes the first row containing [data] from [lst]. 
+    Raises [Not_found] if no row contains [data]. *)

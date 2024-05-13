@@ -42,7 +42,8 @@ let add_user username hashed_password =
       create_user_file ("data/" ^ username ^ "_dinner.csv") [];
       create_user_file ("data/" ^ username ^ "_financials.csv") [];
       create_user_file ("data/" ^ username ^ "_transaction_log.csv") [];
-      create_user_file ("data/" ^ username ^ "_goals_list.csv") [];
+      create_user_file ("data/" ^ username ^ "_incomplete_goals.csv") [];
+      create_user_file ("data/" ^ username ^ "_complete_goals.csv") [];
       let copy_defaults src_file dest_file =
         if Sys.file_exists src_file then
           let data = Csv.load src_file in

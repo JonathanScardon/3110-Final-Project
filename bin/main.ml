@@ -66,7 +66,9 @@ and delete () =
         Sys.remove ("data/" ^ username ^ "_financials.csv");
         Sys.remove ("data/" ^ username ^ "_stock_financials.csv");
         Sys.remove ("data/" ^ username ^ "_transaction_log.csv");
-        Sys.remove ("data/" ^ username ^ "_goals_list.csv");
+        Ocamlife.Goals.delete_goal_logs username;
+        Sys.remove ("data/" ^ username ^ "_incomplete_goals.csv");
+        Sys.remove ("data/" ^ username ^ "_complete_goals.csv");
         print_string [ Foreground Green ] "\nAccount removed successfully.";
         print_menu ();
         process_choice ()

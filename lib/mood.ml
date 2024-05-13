@@ -6,7 +6,7 @@ let () = Random.self_init ()
 let day = string_of_int (Unix.localtime (Unix.time ())).tm_mday
 let month = string_of_int ((Unix.localtime (Unix.time ())).tm_mon + 1)
 let year = string_of_int ((Unix.localtime (Unix.time ())).tm_year + 1900)
-let curr_date = day ^ "-" ^ month ^ "-" ^ year
+let curr_date = month ^ "-" ^ day ^ "-" ^ year
 
 let get_user_input prompt =
   print_string [ Reset ] prompt;

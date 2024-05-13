@@ -456,16 +456,43 @@ and goals_interface user =
   print_strings [ Reset ]
     (*begin by displaying all current goals, then prompt with menu?*)
     [
-      "1. Add a goal\n";
-      "2. Log progress towards a goal\n";
-      "3. Mark a goal as complete\n";
+      "1. Add a new goal\n";
+      "2. Log progress\n";
+      "3. Mark goal as complete\n";
       "4. Remove a goal\n";
-      "5. View all goals\n";
-      "6. View progress log\n";
-      (*should display all current goals to user*)
-      "7. Return to main menu\n";
+      "5. View in-progress goals\n";
+      "6. View complete goals\n";
+      "7. View progress logs\n";
+      "8. Exit\n";
     ];
   print_string [ Bold ] "Please choose an option (1-7): ";
   goals_menu_choice user
 
-and goals_menu_choice user = print_endline user
+and goals_menu_choice user =
+  let choice = read_line () in
+  match choice with
+  | "1" ->
+      Goals.add_new_goal user;
+      goals_interface user
+  | "2" ->
+      Goals.log_progress user;
+      goals_interface user
+  | "3" ->
+      Goals.complete_goal user;
+      goals_interface user
+  | "4" ->
+      Goals.remove_goal user;
+      goals_interface user
+  | "5" ->
+      Goals.view_incomplete_goals user;
+      goals_interface user
+  | "6" ->
+      Goals.view_complete_goals user;
+      goals_interface user
+  | "7" ->
+      Goals.view_progress_log user;
+      goals_interface user
+  | "8" -> dashboard_login user
+  | _ ->
+      print_string [] "Invalid option. Please try again.\n";
+      goals_interface user

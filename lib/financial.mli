@@ -1,6 +1,11 @@
 exception CreditLimitReached
 
+val load_financial_data : string -> Csv.t 
+(** [load_financial_data user] loads the [user]'s financial data from their CSV 
+    file as a string list list *)
 val view_financial : string -> string -> unit
+(** [view_financial user aspect] allows the [user] to view an [aspect] of their 
+    financial data. The [aspect] is either their credit cards or bank accounts. *)
 
 val prompt_add_account : string -> unit
 (** [prompt_add_account user] adds a new account with a user-specified 
@@ -21,8 +26,16 @@ val remove_credit : string -> unit
 (** [remove_credit user] removes a credit card specified by the user. *)
 
 val view_transactions : string -> unit
+(** [view_transactions user] allows [user] to view their transaction history. *)
+
 val make_transaction : string -> unit
+(** [make_transaction user] allows [user] to make a transaction on one of their 
+    credit cards*)
+
 val prompt_pay_credit : string -> unit
+(** [prompt_pay_credit user] allows [user] to make a transfer to pay their credit
+    card from a bank account. It prompts them for the credit card they want to pay, 
+    as well as the bank account they want to pay from. *)
 
 val modify_financial :
   string -> string -> float -> string list list -> string -> string list list
