@@ -1,6 +1,6 @@
 _build/
 _opam/
-data/*.csv
 *.coverage
 .DS_Store
 data/user_credentials.csv
+*._coverage/
