@@ -10,7 +10,6 @@ val fetch_stock_data : string -> string option
 (** [fetch_stock_data symbol] returns the price for the provided stock [symbol]*)
 
 val update_stock_prices : string -> unit
-val calculate_portfolio_value : string -> float
 
 val add_stock : string -> string -> int -> float -> unit
 (** [add_stock user_id symbol shares purchase_price] adds [shares] number of 
