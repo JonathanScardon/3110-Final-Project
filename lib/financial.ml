@@ -2,10 +2,6 @@ open ANSITerminal
 
 exception CreditLimitReached
 
-(* type account = { name : string; balance : float }
-   type credit_card = { name : string; limit : float; balance : float }
-   type transaction = { date : string; amount : float; description : string } *)
-
 let day = string_of_int (Unix.localtime (Unix.time ())).tm_mday
 let month = string_of_int ((Unix.localtime (Unix.time ())).tm_mon + 1)
 let year = string_of_int ((Unix.localtime (Unix.time ())).tm_year + 1900)
@@ -394,24 +390,3 @@ let rec make_transaction user =
 let view_transactions user =
   Data.see_history "\nDate | Type | Amount | Company/Person"
     (user_transaction_log_file user)
-
-(* total balance *)
-
-(* let calculate_total_balance user =
-     let data = load_financial_data user in
-     List.fold_left
-       (fun acc row ->
-         if List.nth row 0 = "account" then acc +. float_of_string (List.nth row 2)
-         else acc)
-       0.0 data
-
-   let save_total_balance user =
-     let total = calculate_total_balance user in
-     let data = load_financial_data user in
-     let updated_data =
-       List.map
-         (fun row ->
-           if List.nth row 0 = "TB" then [ "TB"; string_of_float total ] else row)
-         data
-     in
-     save_financial_data user updated_data *)

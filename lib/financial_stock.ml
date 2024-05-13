@@ -68,19 +68,6 @@ let update_stock_prices user_id =
   in
   save_user_stock_financials user_id updated_stocks
 
-let calculate_portfolio_value user_id =
-  let stocks = load_user_stock_financials user_id in
-  let total_value =
-    List.fold_left
-      (fun acc row ->
-        match row with
-        | _ :: shares :: price :: _ ->
-            acc +. (float_of_string shares *. float_of_string price)
-        | _ -> acc)
-      0.0 stocks
-  in
-  total_value
-
 let add_stock user_id symbol shares purchase_price =
   try
     let stocks = load_user_stock_financials user_id in
