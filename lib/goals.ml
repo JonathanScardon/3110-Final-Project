@@ -1,17 +1,15 @@
 open ANSITerminal
 
-(*
-let day = string_of_int (Unix.localtime (Unix.time ())).tm_mday
-let month = string_of_int ((Unix.localtime (Unix.time ())).tm_mon + 1)
-let year = string_of_int ((Unix.localtime (Unix.time ())).tm_year + 1900)
-let curr_date = month ^ "-" ^ day ^ "-" ^ year
-*)
+
+let incomplete_goals_path user = 
+  "data/" ^ user ^ "_incomplete_goals.csv"
+
 
 let add_new_goal user =
   print_string [] "\n";
   print_string [] "What would you like to title your new goal?\n";
   let goal_name = read_line () in
-  let path = "data/" ^ user ^ "_incomplete_goals.csv" in
+  let path = incomplete_goals_path user in
   if Data.search goal_name path then
     print_string [Bold; Foreground Red] "Error: you've already added this goal!\n"
   else
@@ -27,9 +25,10 @@ let add_new_goal user =
           (Printf.sprintf "Failed to create file %s: %s\n" goal_file_path msg)
     end
 
+
 let display_all_goals user =
   print_newline ();
-  let path = "data/" ^ user ^ "_incomplete_goals.csv" in
+  let path = incomplete_goals_path user in
   let csv_content = Csv.load path in
   match csv_content with
   | [] -> print_endline "No goals available."
@@ -48,7 +47,7 @@ let log_progress user =
   print_newline ();
   print_string [] "Which goal would like you like to log progress towards? ";
   let target_goal = read_line () in
-  let path = "data/" ^ user ^ "_incomplete_goals.csv" in
+  let path = incomplete_goals_path user in
   if Data.search target_goal path then
     begin
     print_string [] "Please describe the progress you've made: ";
@@ -60,16 +59,52 @@ let log_progress user =
   else
     print_string [Bold; Foreground Red] "Error: Goal not found\n"
 
+
+let remove_goal_helper user goal_id =
+  let path = incomplete_goals_path user in
+  let original_goals = Csv.load path in
+  let filtered_goals = List.filter (fun goal -> List.hd goal <> goal_id) original_goals in
+  Csv.save path filtered_goals
+
+
+let remove_goal user =
+  print_newline ();
+  print_string [] "Which goal would like you to remove? Note that only incomplete goals can be removed. ";
+  let target_goal = read_line () in
+  let path = incomplete_goals_path user in
+  if Data.search target_goal path then
+    begin
+      print_string [] ("Are you sure you would like to remove " ^ target_goal ^ "? [y/n] ");
+      let rec prompt_user () =
+        let user_response = String.uppercase_ascii (read_line ()) in
+        match user_response with
+        | "Y" ->
+          Sys.remove ("data/" ^ user ^ "_" ^ target_goal ^ ".csv");
+          remove_goal_helper user target_goal;
+          print_string [Bold;Foreground Green] (target_goal ^ " successfully removed.\n")
+        | "N" ->
+          ()
+        | _ ->
+          print_string [] "Please enter 'y' for yes or 'n' for no: ";
+          prompt_user ()
+      in
+      prompt_user ()
+    end
+  else
+    print_string [Bold;Foreground Red] "Error: Goal not found\n"
+
+
 let complete_goal user =
   print_newline ();
   print_string [] "Which goal would you like to mark as complete? ";
   let target_goal = read_line () in
-  let incomplete_goal_path = "data/" ^ user ^ "_incomplete_goals.csv" in
+  let incomplete_goal_path = incomplete_goals_path user in
   if Data.search target_goal incomplete_goal_path then
     begin
-    let complete_goal_path = "data/" ^ user ^ "complete_goals.csv" in
+    remove_goal_helper user target_goal;
+    let complete_goal_path = "data/" ^ user ^ "_complete_goals.csv" in
     Data.add_data (target_goal :: Mood.curr_date :: []) complete_goal_path;    
-    print_string [Bold;Foreground Green] ("Congratulations on accomplishing your goal!" ^ target_goal ^ "is now marked as complete");
+    print_string [Bold;Foreground Green] ("Congratulations on accomplishing your goal! " ^ target_goal ^ " is now marked as complete.\n");
     end
   else
     print_string [Bold;Foreground Red] "Error: Goal not found\n"
