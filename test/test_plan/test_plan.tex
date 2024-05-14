@@ -1,0 +1,25 @@
+\documentclass{article}
+\begin{document}
+\setlength\parindent{0pt}
+
+\title{3110 Final Project Test Plan}
+\maketitle
+
+We manually tested functions with unit outputs, including recursive menu
+input/output. We analyzed the aftereffects of these functions as well as
+the flow of the program from a user perspective.
+\vspace{10pt}
+
+We also tested manually to ensure that the output looked correct for the user. \vspace{10pt}
+
+Using OUnit, we tested functions that did not have a unit return value, including extensive tests for Data, since this provided the backbone of
+other modules. Financial and Authentication did not rely on Data as much, so they had their own OUnit tests. Most of our OUnit tests involved CSV data
+or string list lists. \vspace{5pt}
+
+Test cases were developed using a black box method, looking at specifications instead of implementations. \vspace{10pt}
+
+Our testing approach demonstrates the correctness of the system because it
+combines manual testing and OUnit tests to achieve full coverage. We tested
+all possible actions a user could take.
+
+\end{document}
