@@ -12,7 +12,7 @@ let rec get_valid_int prompt error_msg =
   | input -> (
       try Some (int_of_string input)
       with Failure _ ->
-        print_endline error_msg;
+        print_string [ Foreground Red ] (error_msg ^ "\n");
         get_valid_int prompt error_msg)
 
 let rec get_valid_float prompt error_msg =
@@ -22,7 +22,7 @@ let rec get_valid_float prompt error_msg =
   | input -> (
       try Some (float_of_string input)
       with Failure _ ->
-        print_endline error_msg;
+        print_string [ Foreground Red ] ("\n" ^ error_msg ^ "\n");
         get_valid_float prompt error_msg)
 
 let rec get_valid_string prompt error_msg =
@@ -31,7 +31,7 @@ let rec get_valid_string prompt error_msg =
   if input = "" || input = "back" then
     if input = "back" then None
     else (
-      print_endline error_msg;
+      print_string [ Foreground Red ] ("\n" ^ error_msg ^ "\n");
       get_valid_string prompt error_msg)
   else Some input
 
@@ -424,29 +424,35 @@ and prompt_modify_stock user =
       "\nPlease enter a valid symbol."
   with
   | Some symbol when symbol <> "back" -> (
-      match
-        get_valid_int "\nEnter new number of shares: "
-          "\nPlease enter a valid integer number of shares."
-      with
-      | Some shares -> (
-          match
-            get_valid_float
-              "\nEnter new purchase price (use a decimal point for cents): "
-              "\nPlease enter a valid price."
-          with
-          | Some purchase_price -> (
-              match
-                get_valid_float
-                  "\nEnter last known price (use a decimal point for cents): "
-                  "\nPlease enter a valid price."
-              with
-              | Some last_price ->
-                  Financial_stock.modify_stock user symbol shares purchase_price
-                    last_price;
-                  manage_stock_options user
-              | None -> manage_stock_options user)
-          | None -> manage_stock_options user)
-      | None -> manage_stock_options user)
+      let symbol = String.capitalize_ascii symbol in
+      let path = "data/" ^ user ^ "_stock_financials.csv" in
+      if not (Data.search symbol path) then (
+        print_string [ Foreground Red ] "\nStock symbol not found.\n";
+        prompt_modify_stock user)
+      else
+        match
+          get_valid_int "\nEnter new number of shares: "
+            "\nPlease enter a valid integer number of shares."
+        with
+        | Some shares -> (
+            match
+              get_valid_float
+                "\nEnter new purchase price (use a decimal point for cents): "
+                "\nPlease enter a valid price."
+            with
+            | Some purchase_price -> (
+                match
+                  get_valid_float
+                    "\nEnter last known price (use a decimal point for cents): "
+                    "\nPlease enter a valid price."
+                with
+                | Some last_price ->
+                    Financial_stock.modify_stock user symbol shares
+                      purchase_price last_price;
+                    manage_stock_options user
+                | None -> manage_stock_options user)
+            | None -> manage_stock_options user)
+        | None -> manage_stock_options user)
   | _ -> manage_stock_options user
 
 (* goals interface *)

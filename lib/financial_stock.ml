@@ -1,4 +1,5 @@
 open Yojson.Basic.Util
+open ANSITerminal
 
 (* stock tracker *)
 let api_key = "64ROAIJNDDZD98UE"
@@ -80,11 +81,19 @@ let add_stock user_id symbol shares purchase_price =
   | ex -> Printf.printf "Unexpected error: %s\n" (Printexc.to_string ex)
 
 let remove_stock user_id symbol =
-  let stocks = load_user_stock_financials user_id in
-  let filtered_stocks = List.filter (fun row -> List.hd row <> symbol) stocks in
-  save_user_stock_financials user_id filtered_stocks
+  let symbol = String.capitalize_ascii symbol in
+  let path = "data/" ^ user_id ^ "_stock_financials.csv" in
+  if Data.search symbol path then (
+    let stocks = load_user_stock_financials user_id in
+    let filtered_stocks =
+      List.filter (fun row -> List.hd row <> symbol) stocks
+    in
+    save_user_stock_financials user_id filtered_stocks;
+    print_string [ Foreground Green ] "\nStock removed successfully!\n")
+  else print_string [ Foreground Red ] "\nStock symbol not found.\n"
 
 let modify_stock user_id symbol shares purchase_price last_price =
+  let symbol = String.capitalize_ascii symbol in
   let stocks = load_user_stock_financials user_id in
 
   let new_stocks, modified =
@@ -111,10 +120,11 @@ let modify_stock user_id symbol shares purchase_price last_price =
 
   if List.exists (fun flag -> flag) modified then (
     save_user_stock_financials user_id new_stocks;
-    Printf.printf "Stock modified successfully. Updated data for %s.\n" symbol)
+    print_string [ Foreground Green ]
+      ("\nStock modified successfully. Updated data for " ^ symbol ^ ".\n"))
   else
-    Printf.printf "Error: Stock symbol '%s' not found. No changes made.\n"
-      symbol
+    print_string [ Foreground Red ]
+      ("\nError: Stock symbol " ^ symbol ^ " not found. No changes made.\n")
 
 let view_stock_spread user =
   let stocks = load_user_stock_financials user in
